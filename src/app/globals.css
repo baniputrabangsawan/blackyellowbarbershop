@@ -1,26 +1,127 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-heading: var(--font-heading);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--primary);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  
+  --color-destructive: var(--danger);
+  --color-destructive-foreground: #ffffff;
+  
+  --color-muted: var(--surface-elevated);
+  --color-muted-foreground: var(--muted-foreground);
+  
+  --color-accent: var(--surface-elevated);
+  --color-accent-foreground: var(--foreground);
+  
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--foreground);
+  
+  --color-card: var(--surface);
+  --color-card-foreground: var(--foreground);
+  
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: calc(var(--radius-lg) * 1.5);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* Core Colors */
+  --background: #0b0b0b;
+  --surface: #141414;
+  --surface-elevated: #1c1c1c;
+  --foreground: #f7f7f2;
+  --muted-foreground: #a1a1aa;
+
+  /* Primary */
+  --primary: #facc15;
+  --primary-hover: #eab308;
+  --primary-foreground: #111111;
+
+  /* Secondary */
+  --secondary: #f7f3e8;
+  --secondary-foreground: #171717;
+
+  /* Utilities */
+  --border: #2a2a2a;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+
+  /* Radius */
+  --radius-sm: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  
+  /* Sidebar placeholders */
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--surface-elevated);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--primary);
+}
+
+.dark {
+  /* Using same tokens for dark mode since this is a dark-themed app natively */
+  --background: #0b0b0b;
+  --surface: #141414;
+  --surface-elevated: #1c1c1c;
+  --foreground: #f7f7f2;
+  --muted-foreground: #a1a1aa;
+
+  --primary: #facc15;
+  --primary-hover: #eab308;
+  --primary-foreground: #111111;
+
+  --secondary: #f7f3e8;
+  --secondary-foreground: #171717;
+
+  --border: #2a2a2a;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
 }
