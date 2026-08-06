@@ -7,9 +7,9 @@ import { revalidatePath } from "next/cache";
 const queueSchema = z.object({
   customerName: z.string().min(2, "Nama minimal 2 karakter"),
   phone: z.string().min(10, "Nomor WhatsApp tidak valid"),
-  serviceId: z.string().uuid("Layanan harus dipilih"),
-  preferredBarberId: z.string().optional().or(z.literal("")),
-  branchId: z.string().uuid("Cabang tidak valid"),
+  serviceId: z.string().min(1, "Layanan harus dipilih"),
+  preferredBarberId: z.string().nullable().optional().or(z.literal("")),
+  branchId: z.string().min(1, "Cabang tidak valid"),
 });
 
 export async function createQueue(formData: FormData) {

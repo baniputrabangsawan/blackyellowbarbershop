@@ -1,14 +1,34 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import { Users, CalendarClock, Scissors, Settings, LogOut, ShieldCheck } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { logoutAction } from "../login/actions";
 
 export const metadata = {
   title: "Admin Dashboard | Black Yellow Barbershop",
 };
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
-  // In a full implementation, we'd check Supabase Auth session here and redirect to /admin/login if not logged in.
-  // For MVP, we'll assume they are logged in if they reach this page.
+export default async function AdminLayout({ children }: { children: ReactNode }) {
+  const supabase = await createClient();
+  const { data: { user }, error } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    redirect("/admin/login");
+  }
+
+  // Cek apakah user ada di tabel admin_users
+  const { data: adminUser, error: adminError } = await supabase
+    .from("admin_users")
+    .select("role")
+    .eq("user_id", user.id)
+    .single();
+
+  if (adminError || !adminUser) {
+    // Memaksa logout jika bukan admin
+    await supabase.auth.signOut();
+    redirect("/admin/login");
+  }
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -42,10 +62,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </Link>
         </nav>
         <div className="p-4 border-t border-border">
-          <button className="flex items-center gap-3 px-4 py-3 w-full rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors text-left">
-            <LogOut size={20} />
-            Keluar
-          </button>
+          <form action={logoutAction}>
+            <button type="submit" className="flex items-center gap-3 px-4 py-3 w-full rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors text-left">
+              <LogOut size={20} />
+              Keluar
+            </button>
+          </form>
         </div>
       </aside>
 
@@ -53,7 +75,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <main className="flex-1 overflow-y-auto bg-background">
         <header className="md:hidden p-4 border-b border-border bg-surface-elevated flex justify-between items-center">
           <span className="font-heading font-bold text-primary">BY<span className="text-foreground">Admin</span></span>
-          <button className="p-2 bg-white/5 rounded-md"><LogOut size={20} className="text-muted-foreground" /></button>
+          <form action={logoutAction}>
+            <button type="submit" className="p-2 bg-white/5 hover:bg-destructive/20 rounded-md">
+              <LogOut size={20} className="text-muted-foreground hover:text-destructive" />
+            </button>
+          </form>
         </header>
         <div className="p-6 md:p-8">
           {children}

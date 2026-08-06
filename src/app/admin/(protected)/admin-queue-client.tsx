@@ -94,7 +94,7 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
     const result = await createQueue(formData);
     
     if (result.error) {
-      alert("Gagal menambahkan: " + result.error);
+      alert(`Gagal menambahkan: ${result.error}\nDetail: ${JSON.stringify(result.details || {})}`);
     } else {
       setIsAddOpen(false);
       setCustomerName("");
