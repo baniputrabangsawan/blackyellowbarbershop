@@ -35,12 +35,24 @@ export function LocationSection() {
                       <MapPin className="text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-heading font-semibold text-lg mb-1 text-foreground">Alamat</h3>
-                      <p className="text-muted-foreground text-sm leading-relaxed">
-                        Jl. AP. Pettarani No. 123<br />
-                        Kec. Panakkukang, Kota Makassar<br />
-                        Sulawesi Selatan 90231
-                      </p>
+                      <h3 className="font-heading font-semibold text-lg mb-3 text-foreground">Alamat Cabang</h3>
+                      <div className="space-y-3">
+                        <div>
+                          <p className="font-medium text-foreground text-sm mb-1.5">Makassar (Pusat)</p>
+                          <p className="text-muted-foreground text-sm leading-relaxed">
+                            Jl. AP. Pettarani No. 123<br />
+                            Kec. Panakkukang, Kota Makassar
+                          </p>
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground text-sm mb-1.5">Gowa</p>
+                          <p className="text-muted-foreground text-sm leading-relaxed">
+                            Jl. Andi Tonro No.64D, Bonto Bontoa<br />
+                            Kec. Somba Opu, Kabupaten Gowa<br />
+                            Sulawesi Selatan 92113
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -97,17 +109,13 @@ export function LocationSection() {
             </div>
             
             {/* You can replace this with actual iframe later */}
-            <iframe 
-              src="https://maps.google.com/maps?q=Makassar,+South+Sulawesi&t=&z=13&ie=UTF8&iwloc=&output=embed" 
-              className="absolute inset-0 w-full h-full opacity-50 grayscale hover:grayscale-0 transition-all duration-500 z-10" 
-              style={{ border: 0 }} 
-              allowFullScreen={true} 
-              loading="lazy" 
-              referrerPolicy="no-referrer-when-downgrade"
-            ></iframe>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4708.67626804175!2d119.50837597937148!3d-5.117271599999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dbefbd4556fd6d3%3A0x7c0eec4315e7126e!2sBlack%20Yellow%20Barbershop%20Makassar!5e1!3m2!1sen!2sid!4v1786023141917!5m2!1sen!2sid" className="absolute inset-0 w-full h-full opacity-50 grayscale hover:grayscale-0 transition-all duration-500 z-10" style={{border:0}} allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin"></iframe>
             
             <div className="absolute bottom-6 right-6 z-20">
-              <Button className="bg-foreground text-background hover:bg-foreground/90 rounded-full shadow-xl">
+              <Button 
+                onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=Black+Yellow+Barbershop+Makassar', '_blank')}
+                className="bg-foreground text-background hover:bg-foreground/90 rounded-full shadow-xl"
+              >
                 <Navigation className="mr-2 h-4 w-4" />
                 Buka di Maps
               </Button>
