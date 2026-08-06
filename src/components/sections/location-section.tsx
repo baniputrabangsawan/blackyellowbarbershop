@@ -98,7 +98,7 @@ export function LocationSection() {
             
             {/* You can replace this with actual iframe later */}
             <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1m3!1d127150.15049581789!2d119.34914104273292!3d-5.187383741870605!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dbee27ab46714ab%3A0x6b24d14db48fec66!2sMakassar%2C%20Makassar%20City%2C%20South%20Sulawesi!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid" 
+              src="https://maps.google.com/maps?q=Makassar,+South+Sulawesi&t=&z=13&ie=UTF8&iwloc=&output=embed" 
               className="absolute inset-0 w-full h-full opacity-50 grayscale hover:grayscale-0 transition-all duration-500 z-10" 
               style={{ border: 0 }} 
               allowFullScreen={true} 
