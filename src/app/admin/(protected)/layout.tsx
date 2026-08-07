@@ -4,6 +4,7 @@ import { Users, CalendarClock, Scissors, Settings, LogOut, ShieldCheck } from "l
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { logoutAction } from "../login/actions";
+import { AdminMobileNav } from "@/components/admin/mobile-nav";
 
 export const metadata = {
   title: "Admin Dashboard | Black Yellow Barbershop",
@@ -72,15 +73,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto bg-background">
-        <header className="md:hidden p-4 border-b border-border bg-surface-elevated flex justify-between items-center">
-          <span className="font-heading font-bold text-primary">BY<span className="text-foreground">Admin</span></span>
-          <form action={logoutAction}>
-            <button type="submit" className="p-2 bg-white/5 hover:bg-destructive/20 rounded-md">
-              <LogOut size={20} className="text-muted-foreground hover:text-destructive" />
-            </button>
-          </form>
-        </header>
+      <main className="flex-1 overflow-y-auto bg-background relative">
+        <AdminMobileNav />
         <div className="p-6 md:p-8">
           {children}
         </div>
