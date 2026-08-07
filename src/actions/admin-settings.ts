@@ -11,7 +11,7 @@ export async function getAdminSettings() {
     .from("branches")
     .select("*")
     .limit(1)
-    .single();
+    .maybeSingle();
 
   // Get site settings for Hero text
   // NOTE: This requires the site_settings table to exist
@@ -19,7 +19,7 @@ export async function getAdminSettings() {
     .from("site_settings")
     .select("*")
     .limit(1)
-    .single();
+    .maybeSingle();
 
   return {
     branch: branchData,
@@ -52,7 +52,7 @@ export async function updateHeroSettings(title: string, subtitle: string, descri
   const supabase = await createClient();
   
   // Update the first row (assuming only one row exists)
-  const { data: existing } = await supabase.from("site_settings").select("id").limit(1).single();
+  const { data: existing } = await supabase.from("site_settings").select("id").limit(1).maybeSingle();
   
   let error;
   
@@ -87,20 +87,32 @@ export async function updateHeroSettings(title: string, subtitle: string, descri
   return { success: true };
 }
 
-export async function resetTodayQueue(branchId: string) {
+export async function resetTodayQueue(branchId: string, reason: string = "Reset manual") {
   const supabase = await createClient();
   const today = new Date().toISOString().split("T")[0];
   
-  // "Reset" could mean cancelling all current queues for today that are not completed
+  // "Reset" means cancelling all current queues for today that are not completed
   const { error } = await supabase
     .from("queues")
-    .update({ status: "cancelled" })
+    .update({ status: "cancelled", cancelled_at: new Date().toISOString() })
     .eq("branch_id", branchId)
     .eq("queue_date", today)
     .in("status", ["waiting", "called", "in_service"]);
 
   if (error) {
     return { success: false, error: error.message };
+  }
+
+  // Audit Log
+  const { data: userData } = await supabase.auth.getUser();
+  if (userData?.user) {
+    await supabase.from("admin_activity_logs").insert({
+      admin_user_id: userData.user.id,
+      action: "RESET_QUEUE",
+      entity_type: "queues",
+      entity_id: branchId,
+      metadata: { reason, date: today }
+    });
   }
 
   revalidatePath("/");

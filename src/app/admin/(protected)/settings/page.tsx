@@ -1,27 +1,32 @@
-import { getAdminSettings } from "@/actions/admin-settings";
-import { AdminSettingsClient } from "./admin-settings-client";
-import { Settings } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
+import { SettingsForm } from "./settings-form";
 
 export const metadata = {
-  title: "Pengaturan Sistem | Admin",
+  title: "Pengaturan Sistem - Black Yellow Admin",
 };
 
-export default async function AdminSettingsPage() {
-  const settings = await getAdminSettings();
+export default async function SettingsPage() {
+  const supabase = await createClient();
+
+  // Ambil data konfigurasi
+  const { data: settings, error } = await supabase
+    .from("site_settings")
+    .select("*")
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    return (
+      <div className="p-8 text-center text-destructive">
+        <h2 className="text-xl font-bold mb-2">Gagal Memuat Konfigurasi</h2>
+        <p>Pastikan Anda telah menjalankan script SQL Migrasi Database (admin_system_migration.sql). Error: {error?.message}</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-          <Settings size={20} />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Pengaturan Sistem</h1>
-          <p className="text-muted-foreground text-sm">Kelola pengaturan cabang, antrean, dan konten publik</p>
-        </div>
-      </div>
-
-      <AdminSettingsClient initialSettings={settings} />
+    <div className="max-w-6xl mx-auto">
+      <SettingsForm initialData={settings} />
     </div>
   );
 }

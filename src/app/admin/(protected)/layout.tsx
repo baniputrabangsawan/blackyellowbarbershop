@@ -1,6 +1,9 @@
 import { ReactNode } from "react";
 import Link from "next/link";
-import { Users, CalendarClock, Scissors, Settings, LogOut, ShieldCheck } from "lucide-react";
+import { 
+  Users, CalendarClock, Scissors, Settings, LogOut, ShieldCheck,
+  Home, Image as ImageIcon, MessageSquare, Tag, Activity
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { logoutAction } from "../login/actions";
@@ -41,26 +44,66 @@ export default async function AdminLayout({ children }: { children: ReactNode })
           </Link>
         </div>
         <nav className="flex-1 p-4 space-y-2">
-          <Link href="/admin" className="flex items-center gap-3 px-4 py-3 rounded-md bg-primary/10 text-primary font-medium transition-colors">
-            <CalendarClock size={20} />
-            Antrean Hari Ini
-          </Link>
-          <Link href="/admin/services" className="flex items-center gap-3 px-4 py-3 rounded-md text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors">
-            <Scissors size={20} />
-            Layanan
-          </Link>
-          <Link href="/admin/barbers" className="flex items-center gap-3 px-4 py-3 rounded-md text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors">
-            <Users size={20} />
-            Barber
-          </Link>
-          <Link href="/admin/memberships" className="flex items-center gap-3 px-4 py-3 rounded-md text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors">
-            <ShieldCheck size={20} />
-            Membership
-          </Link>
-          <Link href="/admin/settings" className="flex items-center gap-3 px-4 py-3 rounded-md text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors">
-            <Settings size={20} />
-            Pengaturan
-          </Link>
+          <div className="px-4 py-2">
+            <Link href="/admin" className="flex items-center gap-3 px-4 py-3 rounded-md bg-primary/10 text-primary font-medium transition-colors">
+              <CalendarClock size={20} />
+              Antrean Hari Ini
+            </Link>
+          </div>
+          
+          <div className="px-4 py-2">
+            <h4 className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Operasional</h4>
+            <div className="space-y-1">
+              <Link href="/admin/services" className="flex items-center gap-3 px-4 py-2.5 rounded-md text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors">
+                <Scissors size={20} />
+                Layanan
+              </Link>
+              <Link href="/admin/barbers" className="flex items-center gap-3 px-4 py-2.5 rounded-md text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors">
+                <Users size={20} />
+                Barber
+              </Link>
+              <Link href="/admin/memberships" className="flex items-center gap-3 px-4 py-2.5 rounded-md text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors">
+                <ShieldCheck size={20} />
+                Membership
+              </Link>
+            </div>
+          </div>
+
+          <div className="px-4 py-2">
+            <h4 className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Konten</h4>
+            <div className="space-y-1">
+              <Link href="/admin/content/homepage" className="flex items-center gap-3 px-4 py-2.5 rounded-md text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors">
+                <Home size={20} />
+                Halaman Utama
+              </Link>
+              <Link href="/admin/content/gallery" className="flex items-center gap-3 px-4 py-2.5 rounded-md text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors">
+                <ImageIcon size={20} />
+                Galeri
+              </Link>
+              <Link href="/admin/content/faq" className="flex items-center gap-3 px-4 py-2.5 rounded-md text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors">
+                <MessageSquare size={20} />
+                FAQ
+              </Link>
+              <Link href="/admin/content/promo" className="flex items-center gap-3 px-4 py-2.5 rounded-md text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors">
+                <Tag size={20} />
+                Promo
+              </Link>
+            </div>
+          </div>
+
+          <div className="px-4 py-2">
+            <h4 className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Sistem</h4>
+            <div className="space-y-1">
+              <Link href="/admin/settings" className="flex items-center gap-3 px-4 py-2.5 rounded-md text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors">
+                <Settings size={20} />
+                Pengaturan
+              </Link>
+              <Link href="/admin/audit-log" className="flex items-center gap-3 px-4 py-2.5 rounded-md text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors">
+                <Activity size={20} />
+                Audit Log
+              </Link>
+            </div>
+          </div>
         </nav>
         <div className="p-4 border-t border-border">
           <form action={logoutAction}>

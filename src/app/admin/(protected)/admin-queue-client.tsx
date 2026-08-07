@@ -4,14 +4,15 @@
 import { useState, useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 import { updateQueueStatus, deleteQueue } from "@/actions/admin-queue";
+import { resetTodayQueue } from "@/actions/admin-settings";
 import { createQueue } from "@/actions/queue";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Loader2, Phone, Plus, Trash2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Loader2, Phone, Plus, Trash2, RefreshCw, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 
 export function AdminQueueClient({ initialQueues, options }: { initialQueues: any[], options?: any }) {
@@ -25,6 +26,12 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
   const [phone, setPhone] = useState("");
   const [serviceId, setServiceId] = useState("");
   const [barberId, setBarberId] = useState("");
+
+  // Reset Queue State
+  const [isResetOpen, setIsResetOpen] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+  const [resetConfirmText, setResetConfirmText] = useState("");
+  const [resetReason, setResetReason] = useState("");
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost',
@@ -106,6 +113,32 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
     setIsAdding(false);
   };
 
+  const activeQueuesCount = queues.filter(q => ['waiting', 'called', 'in_service'].includes(q.status)).length;
+  const waitingQueuesCount = queues.filter(q => q.status === 'waiting').length;
+  const inServiceQueuesCount = queues.filter(q => ['called', 'in_service'].includes(q.status)).length;
+
+  const handleResetQueue = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (resetConfirmText !== "RESET ANTREAN") {
+      alert("Ketik RESET ANTREAN dengan huruf kapital untuk mengonfirmasi.");
+      return;
+    }
+    
+    if (!options?.branches?.[0]?.id) return;
+
+    setIsResetting(true);
+    const result = await resetTodayQueue(options.branches[0].id, resetReason || "Dibatalkan massal oleh admin");
+    
+    if (result.success) {
+      setIsResetOpen(false);
+      setResetConfirmText("");
+      setResetReason("");
+    } else {
+      alert("Gagal mereset: " + result.error);
+    }
+    setIsResetting(false);
+  };
+
   const getStatusBadge = (status: string) => {
     switch(status) {
       case 'waiting': return <Badge className="bg-warning/20 text-warning border-warning/30 hover:bg-warning/30">Menunggu</Badge>;
@@ -120,8 +153,59 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
 
   return (
     <div className="grid gap-4">
-      {/* Tombol Tambah Antrean */}
-      <div className="flex justify-end mb-2">
+      {/* Tombol Aksi */}
+      <div className="flex justify-between items-center mb-2">
+        <div>
+          <Dialog open={isResetOpen} onOpenChange={setIsResetOpen}>
+            <DialogTrigger render={<Button variant="outline" className="text-destructive border-destructive/50 hover:bg-destructive/10" />}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Reset Antrean
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px] bg-surface border-border">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-destructive">
+                  <AlertTriangle className="w-5 h-5" />
+                  Peringatan Reset Antrean!
+                </DialogTitle>
+                <DialogDescription className="pt-2">
+                  Anda akan membatalkan <strong className="text-foreground">{activeQueuesCount} antrean aktif</strong> saat ini 
+                  ({waitingQueuesCount} menunggu, {inServiceQueuesCount} dilayani).
+                  Tindakan ini tidak akan menghapus data, melainkan mengubah statusnya menjadi Batal.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleResetQueue} className="space-y-4 mt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="resetReason">Alasan Reset (Opsional)</Label>
+                  <Input 
+                    id="resetReason" 
+                    placeholder="Misal: Tutup darurat, listrik padam..."
+                    value={resetReason} 
+                    onChange={(e) => setResetReason(e.target.value)} 
+                  />
+                </div>
+                <div className="space-y-2 p-4 bg-destructive/10 border border-destructive/20 rounded-md">
+                  <Label htmlFor="confirmText" className="text-destructive font-semibold">Ketik "RESET ANTREAN" untuk konfirmasi</Label>
+                  <Input 
+                    id="confirmText" 
+                    placeholder="RESET ANTREAN"
+                    value={resetConfirmText} 
+                    onChange={(e) => setResetConfirmText(e.target.value)} 
+                    className="border-destructive/30 focus-visible:ring-destructive"
+                    required 
+                  />
+                </div>
+                <DialogFooter className="mt-6">
+                  <Button type="button" variant="outline" onClick={() => setIsResetOpen(false)}>Batal</Button>
+                  <Button type="submit" variant="destructive" disabled={isResetting || resetConfirmText !== "RESET ANTREAN"}>
+                    {isResetting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                    Proses Reset
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
+        
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
           <DialogTrigger render={<Button className="bg-primary text-primary-foreground hover:bg-primary/90" />}>
             <Plus className="w-4 h-4 mr-2" />
