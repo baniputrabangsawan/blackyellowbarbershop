@@ -22,7 +22,9 @@ export function LoginForm() {
     try {
       const result = await loginAction(formData);
       if (result.success) {
-        router.push("/admin");
+        // Menggunakan window.location.href alih-alih router.push untuk memastikan
+        // status autentikasi Supabase dan cache Next.js benar-benar diperbarui.
+        window.location.href = "/admin";
       } else {
         setErrorMsg(result.error || "Terjadi kesalahan saat login.");
         setIsLoading(false);
