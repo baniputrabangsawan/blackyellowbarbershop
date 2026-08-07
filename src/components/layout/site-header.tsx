@@ -72,23 +72,23 @@ export function SiteHeader() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="absolute top-20 left-0 w-full bg-surface border-b border-border/50 shadow-lg md:hidden"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "calc(100vh - 5rem)" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="absolute top-20 left-0 w-full bg-primary shadow-lg md:hidden overflow-hidden"
           >
-            <nav className="flex flex-col p-6 space-y-4">
+            <nav className="flex flex-col items-center pt-12 p-6 space-y-6">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
-                  className="text-base font-medium text-foreground hover:text-primary transition-colors"
+                  className="text-xl font-bold text-primary-foreground hover:text-background transition-colors text-center"
                 >
                   {link.name}
                 </Link>
               ))}
-              <Link href="/queue" onClick={() => setIsOpen(false)} className={cn(buttonVariants({ variant: "default" }), "mt-4 w-full rounded-full bg-primary text-primary-foreground hover:bg-primary-hover")}>
+              <Link href="/queue" onClick={() => setIsOpen(false)} className={cn(buttonVariants({ variant: "outline" }), "mt-8 w-3/4 max-w-[250px] rounded-full bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary")}>
                 Ambil Antrean
               </Link>
             </nav>

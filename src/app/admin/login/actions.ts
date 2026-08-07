@@ -41,9 +41,8 @@ export async function loginAction(formData: FormData) {
   return { success: true };
 }
 
-export async function logoutAction() {
+export async function logoutAction(formData?: FormData) {
   const supabase = await createClient();
   await supabase.auth.signOut();
   revalidatePath("/", "layout");
-  return { success: true };
 }

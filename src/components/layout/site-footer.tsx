@@ -70,7 +70,12 @@ export function SiteFooter() {
         </div>
 
         <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Black Yellow Barbershop. All rights reserved.</p>
+          <p>
+            <Link href="/admin/login" className="cursor-default select-none focus:outline-none" aria-hidden="true" tabIndex={-1}>
+              &copy;
+            </Link>{" "}
+            {new Date().getFullYear()} Black Yellow Barbershop. All rights reserved.
+          </p>
           <div className="flex gap-6">
             <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>

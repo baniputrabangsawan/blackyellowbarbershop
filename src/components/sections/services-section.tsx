@@ -3,7 +3,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
+import { useState } from "react";
 import { Clock } from "lucide-react";
 
 type ServiceItem = {
@@ -58,6 +59,8 @@ const ServiceCard = ({ service, index }: { service: ServiceItem, index: number }
 );
 
 export function ServicesSection() {
+  const [activeTab, setActiveTab] = useState("haircut");
+
   return (
     <section id="services" className="py-24 bg-background">
       <div className="container mx-auto max-w-7xl px-6 md:px-12">
@@ -70,38 +73,50 @@ export function ServicesSection() {
           </p>
         </div>
 
-        <Tabs defaultValue="haircut" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex justify-center mb-12">
-            <TabsList className="bg-surface-elevated border border-border p-1">
-              <TabsTrigger value="haircut" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-6 py-2 rounded-md font-medium transition-all">Haircut</TabsTrigger>
-              <TabsTrigger value="grooming" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-6 py-2 rounded-md font-medium transition-all">Grooming</TabsTrigger>
-              <TabsTrigger value="package" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-6 py-2 rounded-md font-medium transition-all">Package</TabsTrigger>
+            <TabsList className="bg-surface-elevated border border-border p-1 relative">
+              <TabsTrigger value="haircut" className="relative data-[state=active]:text-primary-foreground data-[state=active]:bg-transparent px-6 py-2 rounded-md font-medium transition-colors">
+                {activeTab === "haircut" && (
+                  <motion.div layoutId="activeTabIndicator" className="absolute inset-0 bg-primary rounded-md" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />
+                )}
+                <span className="relative z-10">Haircut</span>
+              </TabsTrigger>
+              <TabsTrigger value="grooming" className="relative data-[state=active]:text-primary-foreground data-[state=active]:bg-transparent px-6 py-2 rounded-md font-medium transition-colors">
+                {activeTab === "grooming" && (
+                  <motion.div layoutId="activeTabIndicator" className="absolute inset-0 bg-primary rounded-md" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />
+                )}
+                <span className="relative z-10">Grooming</span>
+              </TabsTrigger>
+              <TabsTrigger value="package" className="relative data-[state=active]:text-primary-foreground data-[state=active]:bg-transparent px-6 py-2 rounded-md font-medium transition-colors">
+                {activeTab === "package" && (
+                  <motion.div layoutId="activeTabIndicator" className="absolute inset-0 bg-primary rounded-md" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />
+                )}
+                <span className="relative z-10">Package</span>
+              </TabsTrigger>
             </TabsList>
           </div>
 
-          <TabsContent value="haircut" className="mt-0 outline-none">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {servicesData.haircut.map((service, idx) => (
-                <ServiceCard key={idx} service={service} index={idx} />
-              ))}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="grooming" className="mt-0 outline-none">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {servicesData.grooming.map((service, idx) => (
-                <ServiceCard key={idx} service={service} index={idx} />
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="package" className="mt-0 outline-none">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {servicesData.package.map((service, idx) => (
-                <ServiceCard key={idx} service={service} index={idx} />
-              ))}
-            </div>
-          </TabsContent>
+          <div className="overflow-hidden relative min-h-[400px]">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="w-full"
+              >
+                <TabsContent value={activeTab} className="mt-0 outline-none w-full data-[state=inactive]:hidden block">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {servicesData[activeTab]?.map((service, idx) => (
+                      <ServiceCard key={idx} service={service} index={idx} />
+                    ))}
+                  </div>
+                </TabsContent>
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </Tabs>
       </div>
     </section>
