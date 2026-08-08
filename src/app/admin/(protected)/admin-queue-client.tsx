@@ -16,7 +16,15 @@ import { Loader2, Phone, Plus, Trash2, RefreshCw, AlertTriangle } from "lucide-r
 import { format } from "date-fns";
 
 export function AdminQueueClient({ initialQueues, options }: { initialQueues: any[], options?: any }) {
+  const [prevInitial, setPrevInitial] = useState(initialQueues);
   const [queues, setQueues] = useState(initialQueues);
+  
+  // Sync state with server props when revalidatePath occurs (Official React Pattern)
+  if (initialQueues !== prevInitial) {
+    setPrevInitial(initialQueues);
+    setQueues(initialQueues);
+  }
+
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -30,7 +38,6 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
   // Reset Queue State
   const [isResetOpen, setIsResetOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
-  const [resetConfirmText, setResetConfirmText] = useState("");
   const [resetReason, setResetReason] = useState("");
 
   const supabase = createBrowserClient(
@@ -50,9 +57,7 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
           filter: `queue_date=eq.${new Date().toISOString().split('T')[0]}`
         },
         (payload) => {
-          if (payload.eventType === 'INSERT') {
-            window.location.reload();
-          } else if (payload.eventType === 'UPDATE') {
+          if (payload.eventType === 'UPDATE') {
             setQueues(prev => prev.map(q => 
               q.id === payload.new.id ? { ...q, ...payload.new } : q
             ));
@@ -70,15 +75,28 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
 
   const handleStatusChange = async (queueId: string, newStatus: string) => {
     setLoadingId(queueId);
-    await updateQueueStatus(queueId, newStatus);
-    setLoadingId(null);
+    try {
+      await updateQueueStatus(queueId, newStatus);
+    } catch (error: any) {
+      alert("Gagal mengubah status: " + error.message);
+    } finally {
+      setLoadingId(null);
+    }
   };
 
   const handleDelete = async (queueId: string) => {
     if (!confirm("Yakin ingin menghapus antrean ini secara permanen?")) return;
     setLoadingId(queueId);
-    await deleteQueue(queueId);
-    setLoadingId(null);
+    try {
+      const result = await deleteQueue(queueId);
+      if (!result?.success) {
+        alert("Gagal menghapus antrean: " + result?.error);
+      }
+    } catch (error: any) {
+      alert("Terjadi kesalahan sistem: " + error.message);
+    } finally {
+      setLoadingId(null);
+    }
   };
 
   const handleAddQueue = async (e: React.FormEvent) => {
@@ -119,10 +137,6 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
 
   const handleResetQueue = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (resetConfirmText !== "RESET ANTREAN") {
-      alert("Ketik RESET ANTREAN dengan huruf kapital untuk mengonfirmasi.");
-      return;
-    }
     
     if (!options?.branches?.[0]?.id) return;
 
@@ -131,7 +145,6 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
     
     if (result.success) {
       setIsResetOpen(false);
-      setResetConfirmText("");
       setResetReason("");
     } else {
       alert("Gagal mereset: " + result.error);
@@ -183,20 +196,9 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
                     onChange={(e) => setResetReason(e.target.value)} 
                   />
                 </div>
-                <div className="space-y-2 p-4 bg-destructive/10 border border-destructive/20 rounded-md">
-                  <Label htmlFor="confirmText" className="text-destructive font-semibold">Ketik &quot;RESET ANTREAN&quot; untuk konfirmasi</Label>
-                  <Input 
-                    id="confirmText" 
-                    placeholder="RESET ANTREAN"
-                    value={resetConfirmText} 
-                    onChange={(e) => setResetConfirmText(e.target.value)} 
-                    className="border-destructive/30 focus-visible:ring-destructive"
-                    required 
-                  />
-                </div>
                 <DialogFooter className="mt-6">
                   <Button type="button" variant="outline" onClick={() => setIsResetOpen(false)}>Batal</Button>
-                  <Button type="submit" variant="destructive" disabled={isResetting || resetConfirmText !== "RESET ANTREAN"}>
+                  <Button type="submit" variant="destructive" disabled={isResetting}>
                     {isResetting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                     Proses Reset
                   </Button>

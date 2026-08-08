@@ -21,6 +21,7 @@ export function QueuePreviewSection() {
 
   useEffect(() => {
     let globalSubscription: any = null;
+    let pollInterval: NodeJS.Timeout | null = null;
 
     const fetchInitialData = async () => {
       // Fetch the first active branch to show its queue
@@ -39,17 +40,52 @@ export function QueuePreviewSection() {
             {
               event: '*',
               schema: 'public',
-              table: 'queues',
-              filter: `branch_id=eq.${branchData.id}`
+              table: 'queues'
             },
-            async () => {
+            async (payload) => {
+              console.log("Realtime event received:", payload);
               // Re-fetch the simplified status when any queue changes
               const newStatus = await getLiveQueueStatus(branchData.id);
               const storeState = await getStoreQueueState(branchData.id);
               setStatus({ ...newStatus, storeState });
             }
           )
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'site_settings'
+            },
+            async () => {
+              // Update store state when admin changes settings
+              const storeState = await getStoreQueueState(branchData.id);
+              setStatus(prev => ({ ...prev, storeState }));
+            }
+          )
           .subscribe();
+
+        // Fallback: Polling every 5 seconds to guarantee it auto-updates
+        // This is robust against any WebSocket or Supabase Realtime configuration issues
+        pollInterval = setInterval(async () => {
+          try {
+            const newStatus = await getLiveQueueStatus(branchData.id);
+            const storeState = await getStoreQueueState(branchData.id);
+            
+            setStatus(prev => {
+              if (
+                prev.currentNumber !== newStatus.currentNumber || 
+                prev.waitingCount !== newStatus.waitingCount ||
+                prev.storeState !== storeState
+              ) {
+                return { ...newStatus, storeState };
+              }
+              return prev;
+            });
+          } catch (e) {
+            console.error("Polling error", e);
+          }
+        }, 5000);
       }
     };
 
@@ -58,6 +94,9 @@ export function QueuePreviewSection() {
     return () => {
       if (globalSubscription) {
         supabase.removeChannel(globalSubscription);
+      }
+      if (pollInterval) {
+        clearInterval(pollInterval);
       }
     };
   }, [supabase]);

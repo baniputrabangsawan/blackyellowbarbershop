@@ -9,6 +9,7 @@ import { LocationSection } from "@/components/sections/location-section";
 import { FaqSection } from "@/components/sections/faq-section";
 import { getPublicSettings, getPublicGalleries, getPublicFaqs, getPublicPromos } from "@/actions/settings";
 import { PromoBanner } from "@/components/sections/promo-banner";
+import { RealtimeRefresh } from "@/components/realtime-refresh";
 
 export default async function Home() {
   const settings = await getPublicSettings();
@@ -18,6 +19,7 @@ export default async function Home() {
 
   return (
     <>
+      <RealtimeRefresh />
       <PromoBanner key={promos[0]?.id || 'none'} promos={promos} />
       <SiteHeader settings={settings} />
       <main className="flex-1 w-full flex flex-col">

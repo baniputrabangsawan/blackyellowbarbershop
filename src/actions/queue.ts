@@ -96,25 +96,37 @@ export async function getQueueOptions() {
 
 export async function getLiveQueueStatus(branchId: string) {
   const supabase = await createClient();
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toLocaleString("en-US", { timeZone: "Asia/Makassar" });
+  const todayDateStr = new Date(today).toISOString().split("T")[0];
   
-  const { data, error } = await supabase.rpc("get_live_queue_status_safe", {
-    p_branch_id: branchId,
-    p_today: today
-  });
+  // Dapatkan antrean yang sedang dipanggil / dilayani (maksimal 1 terbaru)
+  const { data: currentQueue } = await supabase
+    .from("queues")
+    .select("queue_number")
+    .eq("branch_id", branchId)
+    .eq("queue_date", todayDateStr)
+    .in("status", ["called", "in_service"])
+    .order("called_at", { ascending: false, nullsFirst: false })
+    .limit(1)
+    .single();
 
-  if (error || !data) {
-    return {
-      currentNumber: null,
-      waitingCount: 0,
-      estimatedWaitMins: 0
-    };
-  }
-  
+  // Dapatkan jumlah yang sedang menunggu
+  const { count: waitingCount } = await supabase
+    .from("queues")
+    .select("id", { count: "exact", head: true })
+    .eq("branch_id", branchId)
+    .eq("queue_date", todayDateStr)
+    .eq("status", "waiting");
+
+  const currentNumber = currentQueue ? currentQueue.queue_number : null;
+  const actualWaitingCount = waitingCount || 0;
+
   return {
-    currentNumber: data.currentNumber,
-    waitingCount: data.waitingCount,
-    estimatedWaitMins: data.estimatedWaitMins
+    currentNumber,
+    waitingCount: actualWaitingCount,
+    // Mengubah estimasi menjadi 40 menit per orang sesuai permintaan
+    estimatedWaitMins: actualWaitingCount * 40,
+    timestamp: Date.now() // Cache buster token for the client
   };
 }
 

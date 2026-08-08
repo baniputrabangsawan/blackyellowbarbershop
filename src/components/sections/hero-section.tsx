@@ -35,8 +35,24 @@ export function HeroSection({ settings }: { settings?: any }) {
           className="max-w-3xl"
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-elevated border border-border mb-6">
-            <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Buka Hari Ini 10:00 - 21:00</span>
+            <span className={`w-2 h-2 rounded-full animate-pulse ${
+              settings?.is_open === false || 
+              settings?.operational_status === 'Istirahat' || 
+              settings?.operational_status === 'Antrean Penuh' || 
+              settings?.operational_status === 'Maintenance'
+                ? 'bg-destructive' 
+                : 'bg-success'
+            }`} />
+            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              {settings?.is_open === false || settings?.operational_status === 'Maintenance' 
+                ? 'Toko Tutup' 
+                : settings?.operational_status === 'Istirahat'
+                ? 'Sedang Istirahat'
+                : settings?.operational_status === 'Antrean Penuh'
+                ? 'Antrean Penuh'
+                : `Buka Hari Ini ${new Date().getDay() === 0 || new Date().getDay() === 6 ? '09:00 - 22:00' : '10:00 - 21:00'}`
+              }
+            </span>
           </div>
 
           <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter text-foreground mb-6 leading-[0.85]">
