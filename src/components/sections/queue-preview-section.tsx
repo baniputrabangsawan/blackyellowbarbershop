@@ -42,8 +42,7 @@ export function QueuePreviewSection() {
               schema: 'public',
               table: 'queues'
             },
-            async (payload) => {
-              console.log("Realtime event received:", payload);
+            async () => {
               // Re-fetch the simplified status when any queue changes
               const newStatus = await getLiveQueueStatus(branchData.id);
               const storeState = await getStoreQueueState(branchData.id);
