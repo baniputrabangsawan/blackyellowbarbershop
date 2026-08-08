@@ -11,6 +11,10 @@ import { AdminMobileNav } from "@/components/admin/mobile-nav";
 
 export const metadata = {
   title: "Admin Dashboard | Black Yellow Barbershop",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {

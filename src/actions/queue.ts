@@ -135,9 +135,9 @@ export async function getStoreQueueState(branchId: string): Promise<'open' | 'cl
     const supabase = await createClient();
     
     // Get current time in Makassar timezone
-    const now = new Date();
-    const makassarTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Makassar" }));
-    const dayOfWeek = makassarTime.getDay(); // 0 is Sunday
+    // const now = new Date();
+    // const makassarTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Makassar" }));
+    // const dayOfWeek = makassarTime.getDay(); // 0 is Sunday (temporarily unused)
     
     // Check if the branch is manually closed by the admin (is_active = false)
     const { data: branch } = await supabase

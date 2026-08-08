@@ -3,6 +3,10 @@ import { LoginForm } from "./login-form";
 export const metadata = {
   title: "Admin Login | Black Yellow Barbershop",
   description: "Masuk ke Dashboard Admin Black Yellow Barbershop",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 import Image from "next/image";

@@ -20,7 +20,7 @@ export function HeroSection({ settings }: { settings?: any }) {
         <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background z-10" />
         <Image
           src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=2074&auto=format&fit=crop"
-          alt="Black Yellow Barbershop Interior"
+          alt="Interior Black Yellow Barbershop Makassar - Tempat cukur rambut premium"
           fill
           priority
           className="object-cover object-center"
@@ -55,9 +55,14 @@ export function HeroSection({ settings }: { settings?: any }) {
             </span>
           </div>
 
-          <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter text-foreground mb-6 leading-[0.85]">
-            {title}<br />
-            <span className="text-primary/90">{subtitle}</span>
+          <h1 className="flex flex-col gap-3 mb-6">
+            <span className="text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-primary">
+              Black Yellow Barbershop Makassar
+            </span>
+            <span className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter text-foreground leading-[0.85]">
+              {title}<br />
+              <span className="text-primary/90">{subtitle}</span>
+            </span>
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-10 leading-relaxed">
