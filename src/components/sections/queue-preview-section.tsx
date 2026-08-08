@@ -11,6 +11,7 @@ import { getLiveQueueStatus, getStoreQueueState } from "@/actions/queue";
 import { createBrowserClient } from "@supabase/ssr";
 
 export function QueuePreviewSection() {
+  const [isLoading, setIsLoading] = useState(true);
   const [status, setStatus] = useState({ currentNumber: null as number | null, waitingCount: 0, estimatedWaitMins: 0, storeState: 'offline' });
 
   const supabase = createBrowserClient(
@@ -28,6 +29,7 @@ export function QueuePreviewSection() {
         const initialStatus = await getLiveQueueStatus(branchData.id);
         const storeState = await getStoreQueueState(branchData.id);
         setStatus({ ...initialStatus, storeState });
+        setIsLoading(false);
 
         // Subscribe to real-time updates for this branch's queues
         globalSubscription = supabase
@@ -78,12 +80,16 @@ export function QueuePreviewSection() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              {status.storeState === 'open' ? (
+              {isLoading ? (
+                <div className="inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-semibold ring-offset-background h-11 px-8 bg-muted text-muted-foreground">
+                  Memuat Status...
+                </div>
+              ) : status.storeState === 'open' ? (
                 <Link href="/queue" className={buttonVariants({ size: "lg", className: "rounded-full bg-primary text-primary-foreground hover:bg-primary-hover px-8 font-semibold" })}>
                   Ambil Antrean Sekarang
                 </Link>
               ) : (
-                <div className="inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-semibold ring-offset-background h-11 px-8 bg-muted text-muted-foreground cursor-not-allowed">
+                <div className="inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-bold ring-offset-background h-11 px-8 bg-destructive/10 text-destructive border border-destructive/20 cursor-not-allowed">
                   Pendaftaran Ditutup
                 </div>
               )}
@@ -102,17 +108,22 @@ export function QueuePreviewSection() {
                 <div className="flex justify-between items-center mb-8">
                   <div className="flex items-center gap-2">
                     <span className="relative flex h-3 w-3">
-                      {status.storeState === 'open' ? (
+                      {isLoading ? (
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-muted-foreground animate-pulse"></span>
+                      ) : status.storeState === 'open' ? (
                         <>
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
                           <span className="relative inline-flex rounded-full h-3 w-3 bg-success"></span>
                         </>
                       ) : (
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-muted-foreground"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-destructive"></span>
                       )}
                     </span>
-                    <span className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-                      {status.storeState === 'open' ? 'Live Update' : 'Toko Tutup'}
+                    <span className={`text-sm font-bold uppercase tracking-wider ${
+                      isLoading ? 'text-muted-foreground' : 
+                      status.storeState === 'open' ? 'text-success' : 'text-destructive'
+                    }`}>
+                      {isLoading ? 'Menghubungkan...' : status.storeState === 'open' ? 'Live Update' : 'Toko Tutup'}
                     </span>
                   </div>
                   <span className="text-xs text-muted-foreground">Otomatis Diperbarui</span>

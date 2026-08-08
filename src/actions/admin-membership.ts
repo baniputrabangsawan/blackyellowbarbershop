@@ -2,8 +2,11 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { verifyAdmin } from "@/lib/auth";
 
 export async function getAdminMemberships() {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) throw new Error("Unauthorized");
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -23,6 +26,8 @@ export async function getAdminMemberships() {
 }
 
 export async function updateMembershipStatus(id: string, status: string, durationDays?: number) {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) return { success: false, error: "Unauthorized" };
   const supabase = await createClient();
   
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

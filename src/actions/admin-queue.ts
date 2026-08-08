@@ -3,8 +3,11 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { verifyAdmin } from "@/lib/auth";
 
 export async function getTodayQueues() {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) throw new Error("Unauthorized");
   const supabase = await createClient();
   const today = new Date().toISOString().split("T")[0];
 
@@ -27,6 +30,8 @@ export async function getTodayQueues() {
 }
 
 export async function updateQueueStatus(queueId: string, status: string) {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) return { success: false, error: "Unauthorized" };
   const supabase = await createClient();
   
   const updateData: any = { status };
@@ -57,6 +62,8 @@ export async function updateQueueStatus(queueId: string, status: string) {
 }
 
 export async function deleteQueue(queueId: string) {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) return { success: false, error: "Unauthorized" };
   const supabase = await createClient();
   
   const { error } = await supabase

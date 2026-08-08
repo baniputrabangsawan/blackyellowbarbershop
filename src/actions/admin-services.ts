@@ -2,8 +2,11 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { verifyAdmin } from "@/lib/auth";
 
 export async function getAdminServices() {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) throw new Error("Unauthorized");
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -20,6 +23,8 @@ export async function getAdminServices() {
 }
 
 export async function updateServiceStatus(serviceId: string, isActive: boolean) {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) return { success: false, error: "Unauthorized" };
   const supabase = await createClient();
   
   const { error } = await supabase
@@ -38,6 +43,8 @@ export async function updateServiceStatus(serviceId: string, isActive: boolean) 
 }
 
 export async function updateServicePrice(serviceId: string, price: number) {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) return { success: false, error: "Unauthorized" };
   const supabase = await createClient();
   
   const { error } = await supabase

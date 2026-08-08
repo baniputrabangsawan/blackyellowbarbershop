@@ -2,8 +2,12 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { verifyAdmin } from "@/lib/auth";
+import { z } from "zod";
 
 export async function getAdminSettings() {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) throw new Error("Unauthorized");
   const supabase = await createClient();
 
   // Get active branch for toggle
@@ -32,6 +36,8 @@ export async function getAdminSettings() {
 }
 
 export async function updateBranchStatus(branchId: string, isActive: boolean) {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) return { success: false, error: "Unauthorized" };
   const supabase = await createClient();
   
   const { error } = await supabase
@@ -48,7 +54,23 @@ export async function updateBranchStatus(branchId: string, isActive: boolean) {
   return { success: true };
 }
 
+const heroSchema = z.object({
+  title: z.string().min(1, "Title wajib diisi").max(100, "Title maksimal 100 karakter"),
+  subtitle: z.string().min(1, "Subtitle wajib diisi").max(150, "Subtitle maksimal 150 karakter"),
+  description: z.string().min(1, "Deskripsi wajib diisi").max(500, "Deskripsi maksimal 500 karakter"),
+});
+
 export async function updateHeroSettings(title: string, subtitle: string, description: string) {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) return { success: false, error: "Unauthorized" };
+
+  const validatedFields = heroSchema.safeParse({ title, subtitle, description });
+  if (!validatedFields.success) {
+    return { success: false, error: "Teks terlalu panjang atau tidak valid." };
+  }
+
+  const { title: safeTitle, subtitle: safeSubtitle, description: safeDesc } = validatedFields.data;
+  
   const supabase = await createClient();
   
   // Update the first row (assuming only one row exists)
@@ -60,9 +82,9 @@ export async function updateHeroSettings(title: string, subtitle: string, descri
     const { error: updateError } = await supabase
       .from("site_settings")
       .update({
-        hero_title: title,
-        hero_subtitle: subtitle,
-        hero_description: description
+        hero_title: safeTitle,
+        hero_subtitle: safeSubtitle,
+        hero_description: safeDesc
       })
       .eq("id", existing.id);
     error = updateError;
@@ -71,9 +93,9 @@ export async function updateHeroSettings(title: string, subtitle: string, descri
     const { error: insertError } = await supabase
       .from("site_settings")
       .insert({
-        hero_title: title,
-        hero_subtitle: subtitle,
-        hero_description: description
+        hero_title: safeTitle,
+        hero_subtitle: safeSubtitle,
+        hero_description: safeDesc
       });
     error = insertError;
   }
@@ -88,6 +110,8 @@ export async function updateHeroSettings(title: string, subtitle: string, descri
 }
 
 export async function resetTodayQueue(branchId: string, reason: string = "Reset manual") {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) return { success: false, error: "Unauthorized" };
   const supabase = await createClient();
   const today = new Date().toISOString().split("T")[0];
   

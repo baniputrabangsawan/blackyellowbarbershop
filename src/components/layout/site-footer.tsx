@@ -65,7 +65,16 @@ export function SiteFooter({ settings }: { settings?: any }) {
               </li>
               <li className="flex justify-between items-center text-primary mt-2">
                 <span>Status Saat Ini</span>
-                <span className="font-semibold bg-primary/10 px-2 py-1 rounded-md">Buka</span>
+                <span className={`font-semibold px-2 py-1 rounded-md ${
+                  settings?.is_open === false || 
+                  settings?.operational_status === 'Istirahat' || 
+                  settings?.operational_status === 'Antrean Penuh' || 
+                  settings?.operational_status === 'Maintenance'
+                    ? 'bg-destructive/10 text-destructive' 
+                    : 'bg-primary/10 text-primary'
+                }`}>
+                  {settings?.operational_status || (settings?.is_open === false ? 'Tutup' : 'Buka')}
+                </span>
               </li>
             </ul>
           </div>

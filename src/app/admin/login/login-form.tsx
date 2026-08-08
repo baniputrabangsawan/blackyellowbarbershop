@@ -10,6 +10,7 @@ import { loginAction } from "./actions";
 import { useRouter } from "next/navigation";
 
 export function LoginForm() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -21,9 +22,9 @@ export function LoginForm() {
     try {
       const result = await loginAction(formData);
       if (result.success) {
-        // Menggunakan window.location.href alih-alih router.push untuk memastikan
-        // status autentikasi Supabase dan cache Next.js benar-benar diperbarui.
-        window.location.assign("/admin");
+        // Menggunakan router.push dan refresh untuk Next.js app router
+        router.push("/admin");
+        router.refresh();
       } else {
         setErrorMsg(result.error || "Terjadi kesalahan saat login.");
         setIsLoading(false);
@@ -36,12 +37,20 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full bg-surface/50 backdrop-blur-xl border-border/50 shadow-2xl">
-      <CardHeader className="space-y-1 pb-6">
-        <CardTitle className="font-heading text-2xl text-foreground">Login Admin</CardTitle>
-        <CardDescription className="text-muted-foreground">
-          Masukkan kredensial Anda untuk melanjutkan.
-        </CardDescription>
+    <Card className="w-full bg-[#151515] border-border/30 shadow-[0_8px_30px_rgb(0,0,0,0.8)] relative overflow-hidden">
+      {/* Subtle accent glow */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
+      
+      <CardHeader className="space-y-1 pb-6 pt-8">
+        <div className="flex flex-col items-center mb-2">
+          <div className="w-14 h-14 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(255,204,0,0.1)]">
+            <span className="font-heading font-bold text-2xl text-primary">BY</span>
+          </div>
+          <CardTitle className="font-heading text-2xl text-foreground tracking-wide">Login Admin</CardTitle>
+          <CardDescription className="text-muted-foreground mt-1.5 text-center">
+            Sistem manajemen Black Yellow
+          </CardDescription>
+        </div>
       </CardHeader>
       <CardContent>
         <form action={onSubmit} className="space-y-6">
@@ -60,7 +69,7 @@ export function LoginForm() {
               placeholder="admin@blackyellow.com"
               required
               autoComplete="email"
-              className="bg-background border-input text-foreground focus-visible:ring-primary"
+              className="bg-background/60 border-border/50 text-foreground focus-visible:ring-primary focus-visible:border-primary h-11 transition-all"
             />
           </div>
           
@@ -73,7 +82,7 @@ export function LoginForm() {
                 type={showPassword ? "text" : "password"}
                 required
                 autoComplete="current-password"
-                className="bg-background border-input text-foreground focus-visible:ring-primary pr-10"
+                className="bg-background/60 border-border/50 text-foreground focus-visible:ring-primary focus-visible:border-primary pr-10 h-11 transition-all"
               />
               <button
                 type="button"
@@ -88,7 +97,7 @@ export function LoginForm() {
           
           <Button 
             type="submit" 
-            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-medium h-11"
+            className="w-full bg-primary text-black hover:bg-primary/90 font-bold h-12 text-base shadow-[0_4px_14px_0_rgba(255,204,0,0.2)] hover:shadow-[0_6px_20px_rgba(255,204,0,0.3)] transition-all mt-4"
             disabled={isLoading}
           >
             {isLoading ? (

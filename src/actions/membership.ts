@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 
 export async function getMembershipPlans() {
   const supabase = await createClient();
@@ -29,6 +30,20 @@ const membershipSchema = z.object({
 export async function createMembership(formData: FormData) {
   const supabase = await createClient();
   
+  // Rate limiting (max 5 membership registrations per day per IP)
+  const headersList = await headers();
+  const ip = headersList.get("x-forwarded-for") || "unknown";
+  const { data: isAllowed } = await supabase.rpc("check_rate_limit", { 
+    p_ip: ip, 
+    p_action: "create_membership", 
+    p_max_req: 5, 
+    p_window_seconds: 86400 
+  });
+
+  if (isAllowed === false) {
+    return { error: "Terlalu banyak percobaan pendaftaran. Silakan coba lagi besok." };
+  }
+
   const validatedFields = membershipSchema.safeParse({
     customerName: formData.get("customerName"),
     phone: formData.get("phone"),
@@ -55,27 +70,24 @@ export async function createMembership(formData: FormData) {
   }
 
   // Generate unique code BYM-<RANDOM>
-  const uniqueId = Math.random().toString(36).substring(2, 8).toUpperCase();
+  const uniqueId = crypto.randomUUID().substring(0, 8).toUpperCase();
   const code = `BYM-${uniqueId}`;
 
-  const { data, error } = await supabase
-    .from("memberships")
-    .insert({
-      code,
-      customer_name: customerName,
-      phone,
-      membership_plan_id: planId,
-      birth_date: birthDate ? birthDate : null,
-      status: "pending"
-    })
-    .select()
-    .single();
+  // Gunakan RPC yang memiliki bypass RLS (Security Definer)
+  const { data, error } = await supabase.rpc("create_membership_safe", {
+    p_customer_name: customerName,
+    p_phone: phone,
+    p_plan_id: planId,
+    p_birth_date: birthDate || null,
+    p_code: code
+  });
 
   if (error) {
-    console.error("Membership Insert Error:", error);
-    return { error: "Terjadi kesalahan saat mendaftar. Silakan coba lagi nanti." };
+    console.error("Error creating membership:", error);
+    return { error: "Gagal memproses pendaftaran. Silakan coba lagi." };
   }
 
+  // data di sini adalah JSON object yang dikembalikan oleh RPC
   revalidatePath("/admin/memberships");
   return { success: true, data };
 }

@@ -2,8 +2,11 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { verifyAdmin } from "@/lib/auth";
 
 export async function getPromos() {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) throw new Error("Unauthorized");
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("promos")
@@ -18,6 +21,8 @@ export async function getPromos() {
 }
 
 export async function createPromo(data: { title: string; description: string; start_date?: string | null; end_date?: string | null; is_active: boolean; cta_text?: string; cta_url?: string }) {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) return { success: false, error: "Unauthorized" };
   const supabase = await createClient();
   
   // Format null explicitly if empty to avoid DB type errors
@@ -37,6 +42,8 @@ export async function createPromo(data: { title: string; description: string; st
 }
 
 export async function updatePromo(id: string, data: { title: string; description: string; start_date?: string | null; end_date?: string | null; is_active: boolean; cta_text?: string; cta_url?: string }) {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) return { success: false, error: "Unauthorized" };
   const supabase = await createClient();
   
   const updateData = {
@@ -55,6 +62,8 @@ export async function updatePromo(id: string, data: { title: string; description
 }
 
 export async function deletePromo(id: string) {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) return { success: false, error: "Unauthorized" };
   const supabase = await createClient();
   const { error } = await supabase.from("promos").delete().eq("id", id);
   

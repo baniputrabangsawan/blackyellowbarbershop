@@ -2,8 +2,11 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { verifyAdmin } from "@/lib/auth";
 
 export async function getGalleries() {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) throw new Error("Unauthorized");
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("galleries")
@@ -19,6 +22,8 @@ export async function getGalleries() {
 }
 
 export async function createGallery(data: { image_url: string; alt_text: string; category: string; sort_order: number; is_published: boolean }) {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) return { success: false, error: "Unauthorized" };
   const supabase = await createClient();
   const { error } = await supabase.from("galleries").insert([data]);
   
@@ -30,6 +35,8 @@ export async function createGallery(data: { image_url: string; alt_text: string;
 }
 
 export async function updateGallery(id: string, data: { image_url: string; alt_text: string; category: string; sort_order: number; is_published: boolean }) {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) return { success: false, error: "Unauthorized" };
   const supabase = await createClient();
   const { error } = await supabase.from("galleries").update(data).eq("id", id);
   
@@ -41,6 +48,8 @@ export async function updateGallery(id: string, data: { image_url: string; alt_t
 }
 
 export async function deleteGallery(id: string) {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) return { success: false, error: "Unauthorized" };
   const supabase = await createClient();
   const { error } = await supabase.from("galleries").delete().eq("id", id);
   

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
   Users, CalendarClock, Scissors, Settings, LogOut, ShieldCheck, 
-  Menu, X, Home, Image as ImageIcon, MessageSquare, Tag, FileText, Activity 
+  Menu, X, Home, Image as ImageIcon, MessageSquare, Tag, FileText, Activity, Globe
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { logoutAction } from "@/app/admin/login/actions";
@@ -40,6 +40,12 @@ const adminGroups = [
     links: [
       { name: "Pengaturan", href: "/admin/settings", icon: Settings },
       { name: "Audit Log", href: "/admin/audit-log", icon: Activity },
+    ]
+  },
+  {
+    title: "Lainnya",
+    links: [
+      { name: "Lihat Website", href: "/", icon: Globe },
     ]
   }
 ];

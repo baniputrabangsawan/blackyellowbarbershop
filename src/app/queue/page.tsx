@@ -36,11 +36,11 @@ export default async function QueuePage() {
               <p className="text-sm text-muted-foreground mt-2">Silakan hubungi kasir atau coba lagi nanti.</p>
             </div>
           ) : storeState !== 'open' ? (
-            <div className="text-center p-12 border border-border rounded-xl bg-surface">
-              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">🔒</span>
+            <div className="text-center p-12 border border-destructive/20 rounded-xl bg-destructive/5">
+              <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4 text-destructive">
+                <span className="text-2xl">🛑</span>
               </div>
-              <h2 className="text-2xl font-bold mb-2 text-foreground">Pendaftaran Ditutup</h2>
+              <h2 className="text-2xl font-bold mb-2 text-destructive">Pendaftaran Ditutup</h2>
               <p className="text-muted-foreground max-w-md mx-auto">
                 {storeState === 'closed' 
                   ? "Mohon maaf, pendaftaran antrean saat ini sedang ditutup atau toko sudah penuh. Silakan coba lagi besok atau kunjungi kami langsung."

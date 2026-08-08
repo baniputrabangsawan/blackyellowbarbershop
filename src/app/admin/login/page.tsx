@@ -37,13 +37,6 @@ export default function AdminLoginPage() {
       {/* Kolom Kanan: Login Form */}
       <div className="flex flex-col items-center justify-center p-6 md:p-12 lg:p-24 relative">
         <div className="w-full max-w-sm">
-          {/* Tampilkan logo di mobile karena kolom kiri disembunyikan */}
-          <div className="lg:hidden flex justify-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center shadow-lg">
-              <span className="font-heading font-bold text-3xl text-primary-foreground">BY</span>
-            </div>
-          </div>
-          
           <LoginForm />
           
           <p className="text-center text-xs text-muted-foreground mt-8">

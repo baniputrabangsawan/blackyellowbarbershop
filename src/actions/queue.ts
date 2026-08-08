@@ -3,6 +3,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
+import { verifyAdmin } from "@/lib/auth";
 
 const queueSchema = z.object({
   customerName: z.string().min(2, "Nama minimal 2 karakter"),
@@ -15,6 +17,25 @@ const queueSchema = z.object({
 export async function createQueue(formData: FormData) {
   const supabase = await createClient();
   
+  const adminCheck = await verifyAdmin();
+  const isAdmin = adminCheck.isAuthorized;
+
+  // Rate limiting (max 3 queues per hour per IP) - BYPASS UNTUK ADMIN
+  if (!isAdmin) {
+    const headersList = await headers();
+    const ip = headersList.get("x-forwarded-for") || "unknown";
+    const { data: isAllowed } = await supabase.rpc("check_rate_limit", { 
+      p_ip: ip, 
+      p_action: "create_queue", 
+      p_max_req: 3, 
+      p_window_seconds: 3600 
+    });
+
+    if (isAllowed === false) {
+      return { error: "Terlalu banyak permintaan. Silakan coba lagi nanti." };
+    }
+  }
+
   // Validation
   const validatedFields = queueSchema.safeParse({
     customerName: formData.get("customerName"),
@@ -30,45 +51,22 @@ export async function createQueue(formData: FormData) {
 
   const { customerName, phone, serviceId, preferredBarberId, branchId } = validatedFields.data;
 
-  // Check store state before creating queue
-  const storeState = await getStoreQueueState(branchId);
-  if (storeState !== 'open') {
-    return { error: "Pendaftaran antrean sedang ditutup atau toko sudah penuh." };
+  // Check store state before creating queue - BYPASS UNTUK ADMIN
+  if (!isAdmin) {
+    const storeState = await getStoreQueueState(branchId);
+    if (storeState !== 'open') {
+      return { error: "Pendaftaran antrean sedang ditutup atau toko sudah penuh." };
+    }
   }
 
-  // Get current date
-  const today = new Date().toISOString().split("T")[0];
-
-  // Calculate new queue number
-  // Using a simple transaction-like approach or just reading max
-  // Note: For high concurrency, a DB function/trigger is better. 
-  // For MVP, we'll fetch max and increment.
-  const { data: maxQueue } = await supabase
-    .from("queues")
-    .select("queue_number")
-    .eq("branch_id", branchId)
-    .eq("queue_date", today)
-    .order("queue_number", { ascending: false })
-    .limit(1)
-    .single();
-
-  const nextNumber = maxQueue ? maxQueue.queue_number + 1 : 1;
-
-  const { data, error } = await supabase
-    .from("queues")
-    .insert({
-      branch_id: branchId,
-      queue_date: today,
-      queue_number: nextNumber,
-      customer_name: customerName,
-      phone,
-      service_id: serviceId,
-      preferred_barber_id: preferredBarberId ? preferredBarberId : null,
-      status: "waiting",
-      source: "web"
-    })
-    .select()
-    .single();
+  // Use the RPC to safely generate next queue number and insert
+  const { data, error } = await supabase.rpc("generate_next_queue", {
+    p_branch_id: branchId,
+    p_customer_name: customerName,
+    p_phone: phone,
+    p_service_id: serviceId,
+    p_barber_id: preferredBarberId || null
+  });
 
   if (error) {
     console.error("Queue Insert Error:", error);
@@ -100,33 +98,23 @@ export async function getLiveQueueStatus(branchId: string) {
   const supabase = await createClient();
   const today = new Date().toISOString().split("T")[0];
   
-  // Get active queue (in_service)
-  const { data: currentQueue } = await supabase
-    .from("queues")
-    .select("queue_number, status, called_at")
-    .eq("branch_id", branchId)
-    .eq("queue_date", today)
-    .in("status", ["called", "in_service"])
-    .order("called_at", { ascending: false })
-    .limit(1)
-    .single();
-    
-  // Get waiting count
-  const { count: waitingCount } = await supabase
-    .from("queues")
-    .select("*", { count: "exact", head: true })
-    .eq("branch_id", branchId)
-    .eq("queue_date", today)
-    .eq("status", "waiting");
-    
-  // Simple estimation logic (15 mins per waiting person as a placeholder)
-  // For MVP, we'll use a static multiplier. In production, we'd use service duration.
-  const estimatedWaitMins = (waitingCount || 0) * 15;
+  const { data, error } = await supabase.rpc("get_live_queue_status_safe", {
+    p_branch_id: branchId,
+    p_today: today
+  });
+
+  if (error || !data) {
+    return {
+      currentNumber: null,
+      waitingCount: 0,
+      estimatedWaitMins: 0
+    };
+  }
   
   return {
-    currentNumber: currentQueue ? currentQueue.queue_number : null,
-    waitingCount: waitingCount || 0,
-    estimatedWaitMins
+    currentNumber: data.currentNumber,
+    waitingCount: data.waitingCount,
+    estimatedWaitMins: data.estimatedWaitMins
   };
 }
 
@@ -139,38 +127,43 @@ export async function getStoreQueueState(branchId: string): Promise<'open' | 'cl
     const makassarTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Makassar" }));
     const dayOfWeek = makassarTime.getDay(); // 0 is Sunday
     
-    const { data: businessHour, error } = await supabase
-      .from("business_hours")
-      .select("open_time, close_time, is_closed")
-      .eq("branch_id", branchId)
-      .eq("day_of_week", dayOfWeek)
+    // Check if the branch is manually closed by the admin (is_active = false)
+    const { data: branch } = await supabase
+      .from("branches")
+      .select("is_active")
+      .eq("id", branchId)
       .single();
-      
-    if (error || !businessHour) {
-      return 'offline';
-    }
-    
-    if (businessHour.is_closed || !businessHour.open_time || !businessHour.close_time) {
+
+    if (branch && branch.is_active === false) {
       return 'closed';
     }
-    
-    const [openHour, openMin] = businessHour.open_time.split(':').map(Number);
-    const [closeHour, closeMin] = businessHour.close_time.split(':').map(Number);
-    
-    const openTimeMinutes = openHour * 60 + openMin;
-    const closeTimeMinutes = closeHour * 60 + closeMin;
-    const currentTimeMinutes = makassarTime.getHours() * 60 + makassarTime.getMinutes();
-    
-    // Registration closes 30 minutes before store close time
-    const cutoffTimeMinutes = closeTimeMinutes - 30;
-    
-    if (currentTimeMinutes < openTimeMinutes || currentTimeMinutes >= cutoffTimeMinutes) {
-      return 'closed';
+
+    // Check Global Site Settings from Admin Dashboard
+    const { data: settings } = await supabase
+      .from("site_settings")
+      .select("is_open, operational_status, accept_new_queue")
+      .limit(1)
+      .maybeSingle();
+
+    if (settings) {
+      if (settings.is_open === false) return 'closed';
+      if (settings.accept_new_queue === false) return 'closed';
+      if (
+        settings.operational_status === 'Istirahat' || 
+        settings.operational_status === 'Antrean Penuh' || 
+        settings.operational_status === 'Maintenance'
+      ) {
+        return 'closed';
+      }
     }
+
+    // We bypass the strict business_hours table check here
+    // because the admin dashboard "Status Operasional" is now the single source of truth.
+    // If the admin sets it to "Buka", it remains open until they change it or turn off "Toko Buka".
     
     return 'open';
   } catch (error) {
-    console.error("Error getting store queue state:", error);
+    console.error("Queue state error:", error);
     return 'offline';
   }
 }

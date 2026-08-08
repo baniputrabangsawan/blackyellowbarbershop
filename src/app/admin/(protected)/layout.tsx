@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import Link from "next/link";
 import { 
   Users, CalendarClock, Scissors, Settings, LogOut, ShieldCheck,
-  Home, Image as ImageIcon, MessageSquare, Tag, Activity
+  Home, Image as ImageIcon, MessageSquare, Tag, Activity, Globe
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -105,7 +105,11 @@ export default async function AdminLayout({ children }: { children: ReactNode })
             </div>
           </div>
         </nav>
-        <div className="p-4 border-t border-border">
+        <div className="p-4 border-t border-border space-y-2">
+          <Link href="/" target="_blank" className="flex items-center gap-3 px-4 py-3 w-full rounded-md text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors text-left">
+            <Globe size={20} />
+            Lihat Website
+          </Link>
           <form action={logoutAction}>
             <button type="submit" className="flex items-center gap-3 px-4 py-3 w-full rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors text-left">
               <LogOut size={20} />

@@ -13,6 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { createMembership } from "@/actions/membership";
 import { Loader2, CheckCircle2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const membershipFormSchema = z.object({
   customerName: z.string().min(2, "Nama minimal 2 karakter"),
@@ -27,6 +28,7 @@ const membershipFormSchema = z.object({
 type MembershipFormValues = z.infer<typeof membershipFormSchema>;
 
 export function MembershipForm({ plans }: { plans: any[] }) {
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<any | null>(null);
@@ -80,7 +82,7 @@ export function MembershipForm({ plans }: { plans: any[] }) {
           <p className="text-sm text-muted-foreground mb-6">
             Silakan tunjukkan kode ini kepada kasir kami pada kunjungan berikutnya untuk aktivasi dan pembayaran (jika ada).
           </p>
-          <Button onClick={() => window.location.assign("/")} variant="outline" className="rounded-full px-8">
+          <Button onClick={() => router.push("/")} variant="outline" className="rounded-full px-8">
             Kembali ke Beranda
           </Button>
         </CardContent>

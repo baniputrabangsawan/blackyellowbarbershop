@@ -2,8 +2,12 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { verifyAdmin } from "@/lib/auth";
 
 export async function getFaqs() {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) throw new Error("Unauthorized");
+
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("faqs")
@@ -19,6 +23,8 @@ export async function getFaqs() {
 }
 
 export async function createFaq(data: { question: string; answer: string; sort_order: number; is_active: boolean }) {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) return { success: false, error: "Unauthorized" };
   const supabase = await createClient();
   const { error } = await supabase.from("faqs").insert([data]);
   
@@ -30,6 +36,8 @@ export async function createFaq(data: { question: string; answer: string; sort_o
 }
 
 export async function updateFaq(id: string, data: { question: string; answer: string; sort_order: number; is_active: boolean }) {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) return { success: false, error: "Unauthorized" };
   const supabase = await createClient();
   const { error } = await supabase.from("faqs").update(data).eq("id", id);
   
@@ -41,6 +49,8 @@ export async function updateFaq(id: string, data: { question: string; answer: st
 }
 
 export async function deleteFaq(id: string) {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) return { success: false, error: "Unauthorized" };
   const supabase = await createClient();
   const { error } = await supabase.from("faqs").delete().eq("id", id);
   

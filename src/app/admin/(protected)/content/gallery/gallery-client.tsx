@@ -5,6 +5,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { createClient } from "@/lib/supabase/client";
 import { createGallery, updateGallery, deleteGallery } from "@/actions/admin-gallery";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,8 @@ export function GalleryClient({ initialGalleries }: { initialGalleries: any[] })
   // Form State
   const [editingId, setEditingId] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState("");
   const [altText, setAltText] = useState("");
   const [category, setCategory] = useState("Umum");
   const [sortOrder, setSortOrder] = useState(0);
@@ -30,6 +33,8 @@ export function GalleryClient({ initialGalleries }: { initialGalleries: any[] })
   const resetForm = () => {
     setEditingId(null);
     setImageUrl("");
+    setSelectedFile(null);
+    setPreviewUrl("");
     setAltText("");
     setCategory("Umum");
     setSortOrder(galleries.length * 10);
@@ -44,6 +49,8 @@ export function GalleryClient({ initialGalleries }: { initialGalleries: any[] })
   const handleOpenEdit = (gallery: any) => {
     setEditingId(gallery.id);
     setImageUrl(gallery.image_url);
+    setSelectedFile(null);
+    setPreviewUrl(gallery.image_url);
     setAltText(gallery.alt_text || "");
     setCategory(gallery.category || "Umum");
     setSortOrder(gallery.sort_order);
@@ -53,9 +60,38 @@ export function GalleryClient({ initialGalleries }: { initialGalleries: any[] })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!imageUrl && !selectedFile) {
+      alert("Harap pilih gambar atau masukkan URL gambar.");
+      return;
+    }
+    
     setIsSaving(true);
+    
+    let finalImageUrl = imageUrl;
+    
+    if (selectedFile) {
+      try {
+        const supabase = createClient();
+        const fileExt = selectedFile.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage.from('gallery').upload(fileName, selectedFile);
+        
+        if (uploadError) {
+          throw uploadError;
+        }
+        
+        const { data: publicUrlData } = supabase.storage.from('gallery').getPublicUrl(fileName);
+        finalImageUrl = publicUrlData.publicUrl;
+      } catch (err: any) {
+        alert("Gagal mengunggah gambar: " + err.message);
+        setIsSaving(false);
+        return;
+      }
+    }
 
-    const data = { image_url: imageUrl, alt_text: altText, category, sort_order: sortOrder, is_published: isPublished };
+    const data = { image_url: finalImageUrl, alt_text: altText, category, sort_order: sortOrder, is_published: isPublished };
 
     if (editingId) {
       const res = await updateGallery(editingId, data);
@@ -111,15 +147,49 @@ export function GalleryClient({ initialGalleries }: { initialGalleries: any[] })
               <DialogTitle>{editingId ? "Edit Foto Galeri" : "Tambah Foto Baru"}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="imageUrl">URL Gambar</Label>
-                <Input 
-                  id="imageUrl" 
-                  value={imageUrl} 
-                  onChange={(e) => setImageUrl(e.target.value)} 
-                  placeholder="https://..."
-                  required 
-                />
+              <div className="space-y-4 border p-4 rounded-md border-border bg-background/50">
+                <div className="space-y-2">
+                  <Label htmlFor="imageFile" className="font-semibold text-primary">Upload File Gambar Baru</Label>
+                  <Input 
+                    id="imageFile" 
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setSelectedFile(file);
+                        setPreviewUrl(URL.createObjectURL(file));
+                        // Kosongkan imageUrl manual agar tahu kita pakai file
+                        setImageUrl(""); 
+                      }
+                    }} 
+                  />
+                </div>
+                <div className="relative flex items-center justify-center">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-border"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-surface px-2 text-muted-foreground">Atau</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="imageUrl">Gunakan URL Gambar (Manual)</Label>
+                  <Input 
+                    id="imageUrl" 
+                    value={imageUrl} 
+                    onChange={(e) => {
+                      setImageUrl(e.target.value);
+                      if (e.target.value) {
+                        setSelectedFile(null);
+                        setPreviewUrl(e.target.value);
+                      } else {
+                        setPreviewUrl("");
+                      }
+                    }} 
+                    placeholder="https://..."
+                  />
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="altText">Alt Text (Deskripsi Gambar untuk SEO)</Label>
@@ -162,10 +232,10 @@ export function GalleryClient({ initialGalleries }: { initialGalleries: any[] })
                 </div>
               </div>
 
-              {imageUrl && (
+              {previewUrl && (
                 <div className="mt-4 p-2 border rounded-md overflow-hidden aspect-video relative bg-black/20">
                   {/* Gunakan img biasa untuk preview agar tidak error jika URL tidak diizinkan di config next/image */}
-                  <img src={imageUrl} alt="Preview" className="object-cover w-full h-full" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                  <img src={previewUrl} alt="Preview" className="object-cover w-full h-full" onError={(e) => (e.currentTarget.style.display = 'none')} />
                 </div>
               )}
 
