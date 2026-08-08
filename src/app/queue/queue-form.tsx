@@ -54,7 +54,7 @@ Mohon info cara pembayarannya. Terima kasih.`;
     const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
     
     // Redirect ke WhatsApp
-    window.location.href = waUrl;
+    window.location.assign(waUrl);
     
     // Tombol akan tetap dalam state loading saat diarahkan ke WA
     setTimeout(() => {

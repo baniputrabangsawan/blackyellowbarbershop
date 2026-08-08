@@ -12,10 +12,23 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Black Yellow Barbershop",
-  description: "Potongan Presisi. Gaya Tanpa Kompromi.",
-};
+import { getPublicSettings } from "@/actions/settings";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getPublicSettings();
+  return {
+    title: settings.seo_title || "Black Yellow Barbershop",
+    description: settings.meta_description || "Potongan Presisi. Gaya Tanpa Kompromi.",
+    openGraph: {
+      title: settings.seo_title || "Black Yellow Barbershop",
+      description: settings.meta_description || "Potongan Presisi. Gaya Tanpa Kompromi.",
+      images: settings.og_image_url ? [settings.og_image_url] : [],
+    },
+    icons: {
+      icon: settings.favicon_url || "/favicon.ico",
+    }
+  };
+}
 
 export default function RootLayout({
   children,

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import * as React from "react";
@@ -17,7 +19,7 @@ const navLinks = [
   { name: "Lokasi", href: "/#location" },
 ];
 
-export function SiteHeader() {
+export function SiteHeader({ settings }: { settings?: any }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
 
@@ -37,10 +39,34 @@ export function SiteHeader() {
     >
       <div className="container mx-auto max-w-7xl px-6 md:px-12 flex h-20 items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <span className="font-heading text-xl font-bold uppercase tracking-tight text-primary">
-            Black<span className="text-foreground">Yellow</span>
-          </span>
+          {settings?.logo_url ? (
+            <img src={settings.logo_url} alt={settings?.business_name || "Logo"} className="h-8 w-auto" />
+          ) : (
+            <span className="font-heading text-xl font-bold uppercase tracking-tight text-primary">
+              {settings?.business_name ? (
+                // Pisahkan kata pertama (misal Black) dan sisanya
+                settings.business_name.split(' ').map((word: string, i: number) => 
+                  i === 0 ? <span key={i}>{word}</span> : <span key={i} className="text-foreground">{word}</span>
+                )
+              ) : (
+                <>Black<span className="text-foreground">Yellow</span></>
+              )}
+            </span>
+          )}
         </Link>
+        
+        {settings && typeof settings.is_open !== 'undefined' && (
+          <div className="hidden md:flex ml-4 mr-auto items-center">
+            <span className={cn(
+              "text-xs font-bold px-2 py-1 rounded-md border uppercase tracking-wider",
+              settings.is_open 
+                ? "bg-green-500/10 text-green-500 border-green-500/20" 
+                : "bg-red-500/10 text-red-500 border-red-500/20"
+            )}>
+              {settings.operational_status || (settings.is_open ? 'BUKA' : 'TUTUP')}
+            </span>
+          </div>
+        )}
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">

@@ -7,24 +7,29 @@ import { BarberSection } from "@/components/sections/barber-section";
 import { GallerySection } from "@/components/sections/gallery-section";
 import { LocationSection } from "@/components/sections/location-section";
 import { FaqSection } from "@/components/sections/faq-section";
-import { getPublicSettings } from "@/actions/settings";
+import { getPublicSettings, getPublicGalleries, getPublicFaqs, getPublicPromos } from "@/actions/settings";
+import { PromoBanner } from "@/components/sections/promo-banner";
 
 export default async function Home() {
   const settings = await getPublicSettings();
+  const galleries = await getPublicGalleries();
+  const faqs = await getPublicFaqs();
+  const promos = await getPublicPromos();
 
   return (
     <>
-      <SiteHeader />
+      <PromoBanner key={promos[0]?.id || 'none'} promos={promos} />
+      <SiteHeader settings={settings} />
       <main className="flex-1 w-full flex flex-col">
         <HeroSection settings={settings} />
         <ServicesSection />
         <QueuePreviewSection />
         <BarberSection />
-        <GallerySection />
-        <LocationSection />
-        <FaqSection />
+        <GallerySection galleries={galleries} />
+        <LocationSection settings={settings} />
+        <FaqSection faqs={faqs} />
       </main>
-      <SiteFooter />
+      <SiteFooter settings={settings} />
     </>
   );
 }

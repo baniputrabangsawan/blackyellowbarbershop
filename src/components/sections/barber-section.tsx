@@ -43,23 +43,27 @@ export function BarberSection() {
   const [itemsPerPage, setItemsPerPage] = useState(1); // Default for mobile (SSR safe)
 
   useEffect(() => {
+    
     const handleResize = () => {
-      setItemsPerPage(window.innerWidth >= 768 ? 3 : 1);
+      const newItemsPerPage = window.innerWidth >= 768 ? 3 : 1;
+      setItemsPerPage(newItemsPerPage);
+      
+      // Pastikan currentIndex tidak melebihi batas jika layar berubah
+      const newMaxIndex = Math.max(0, barbers.length - newItemsPerPage);
+      setCurrentIndex((prev) => (prev > newMaxIndex ? newMaxIndex : prev));
     };
-    // Initial check
-    handleResize();
+    
+    // Initial check (use timeout to avoid synchronous React state update warning during mount)
+    const timeoutId = setTimeout(handleResize, 0);
     
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
-  // Pastikan currentIndex tidak melebihi batas jika layar berubah (misal dari mobile ke desktop)
   const maxIndex = Math.max(0, barbers.length - itemsPerPage);
-  useEffect(() => {
-    if (currentIndex > maxIndex) {
-      setCurrentIndex(maxIndex);
-    }
-  }, [maxIndex, currentIndex]);
 
   const handleNext = () => {
     setCurrentIndex((prev) => Math.min(prev + 1, maxIndex));

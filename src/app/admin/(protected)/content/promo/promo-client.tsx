@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
@@ -116,11 +118,9 @@ export function PromoClient({ initialPromos }: { initialPromos: any[] }) {
     <div className="space-y-4">
       <div className="flex justify-end">
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={handleOpenAdd} className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Plus className="w-4 h-4 mr-2" />
-              Buat Promo Baru
-            </Button>
+          <DialogTrigger render={<Button onClick={handleOpenAdd} className="bg-primary text-primary-foreground hover:bg-primary/90" />}>
+            <Plus className="w-4 h-4 mr-2" />
+            Buat Promo Baru
           </DialogTrigger>
           <DialogContent className="sm:max-w-[600px] bg-surface border-border max-h-[90vh] overflow-y-auto">
             <DialogHeader>

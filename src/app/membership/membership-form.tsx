@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/incompatible-library */
 "use client";
 
 import { useState } from "react";
@@ -79,7 +80,7 @@ export function MembershipForm({ plans }: { plans: any[] }) {
           <p className="text-sm text-muted-foreground mb-6">
             Silakan tunjukkan kode ini kepada kasir kami pada kunjungan berikutnya untuk aktivasi dan pembayaran (jika ada).
           </p>
-          <Button onClick={() => window.location.href = "/"} variant="outline" className="rounded-full px-8">
+          <Button onClick={() => window.location.assign("/")} variant="outline" className="rounded-full px-8">
             Kembali ke Beranda
           </Button>
         </CardContent>

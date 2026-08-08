@@ -184,7 +184,7 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
                   />
                 </div>
                 <div className="space-y-2 p-4 bg-destructive/10 border border-destructive/20 rounded-md">
-                  <Label htmlFor="confirmText" className="text-destructive font-semibold">Ketik "RESET ANTREAN" untuk konfirmasi</Label>
+                  <Label htmlFor="confirmText" className="text-destructive font-semibold">Ketik &quot;RESET ANTREAN&quot; untuk konfirmasi</Label>
                   <Input 
                     id="confirmText" 
                     placeholder="RESET ANTREAN"

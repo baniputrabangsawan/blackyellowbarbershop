@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -95,11 +96,9 @@ export function FaqClient({ initialFaqs }: { initialFaqs: any[] }) {
     <div className="space-y-4">
       <div className="flex justify-end">
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={handleOpenAdd} className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Plus className="w-4 h-4 mr-2" />
-              Tambah FAQ
-            </Button>
+          <DialogTrigger render={<Button onClick={handleOpenAdd} className="bg-primary text-primary-foreground hover:bg-primary/90" />}>
+            <Plus className="w-4 h-4 mr-2" />
+            Tambah FAQ
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px] bg-surface border-border">
             <DialogHeader>
@@ -160,7 +159,7 @@ export function FaqClient({ initialFaqs }: { initialFaqs: any[] }) {
         {faqs.length === 0 ? (
           <Card className="bg-surface border-border border-dashed">
             <CardContent className="p-8 text-center text-muted-foreground">
-              Belum ada FAQ. Klik "Tambah FAQ" untuk mulai membuat.
+              Belum ada FAQ. Klik &quot;Tambah FAQ&quot; untuk mulai membuat.
             </CardContent>
           </Card>
         ) : (

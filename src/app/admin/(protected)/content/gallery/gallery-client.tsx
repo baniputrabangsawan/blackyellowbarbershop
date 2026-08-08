@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
@@ -99,11 +102,9 @@ export function GalleryClient({ initialGalleries }: { initialGalleries: any[] })
     <div className="space-y-4">
       <div className="flex justify-end">
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={handleOpenAdd} className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Plus className="w-4 h-4 mr-2" />
-              Tambah Foto
-            </Button>
+          <DialogTrigger render={<Button onClick={handleOpenAdd} className="bg-primary text-primary-foreground hover:bg-primary/90" />}>
+            <Plus className="w-4 h-4 mr-2" />
+            Tambah Foto
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px] bg-surface border-border">
             <DialogHeader>

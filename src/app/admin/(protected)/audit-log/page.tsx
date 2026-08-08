@@ -3,6 +3,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { format } from "date-fns";
 import { Activity } from "lucide-react";
 
+type AuditLog = {
+  id: string;
+  created_at: string;
+  admin_user_id: string;
+  action: string;
+  entity_type: string;
+  metadata: Record<string, unknown> | null;
+};
+
 export const metadata = {
   title: "Audit Log Sistem - Black Yellow Admin",
 };
@@ -65,7 +74,7 @@ export default async function AuditLogPage() {
                   </tr>
                 )}
                 
-                {!error && logs && logs.map((log: any) => (
+                {!error && logs && (logs as AuditLog[]).map((log) => (
                   <tr key={log.id} className="hover:bg-white/5 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">
                       {format(new Date(log.created_at), "dd MMM yyyy, HH:mm")}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -8,30 +9,8 @@ import {
 } from "@/components/ui/accordion";
 import { motion } from "motion/react";
 
-const faqs = [
-  {
-    question: "Apakah saya harus mengambil antrean secara online?",
-    answer: "Tidak wajib. Anda tetap bisa datang langsung (walk-in) dan mengambil antrean di kasir kami. Namun, mengambil antrean online akan menghemat waktu Anda karena Anda bisa memantau nomor antrean dari mana saja."
-  },
-  {
-    question: "Berapa lama nomor antrean saya berlaku?",
-    answer: "Nomor antrean hanya berlaku pada hari yang sama. Jika nomor Anda terlewat lebih dari 3 nomor karena tidak hadir saat dipanggil, status antrean Anda bisa diubah menjadi 'Tidak Hadir' oleh admin kami."
-  },
-  {
-    question: "Apakah saya bisa memilih barber tertentu?",
-    answer: "Ya! Saat mengambil antrean (baik online maupun di tempat), Anda dapat memilih barber preferensi Anda. Jika barber tersebut sedang melayani pelanggan lain, Anda mungkin perlu menunggu sedikit lebih lama."
-  },
-  {
-    question: "Bagaimana cara menjadi member Black Yellow?",
-    answer: "Anda dapat mendaftar melalui website kami atau menanyakannya langsung di kasir. Pendaftaran melalui website akan diverifikasi terlebih dahulu oleh tim kami sebelum aktif."
-  },
-  {
-    question: "Metode pembayaran apa saja yang diterima?",
-    answer: "Saat ini kami menerima pembayaran tunai (cash), QRIS, dan transfer bank langsung di kasir. Pembayaran melalui website belum tersedia untuk saat ini."
-  }
-];
-
-export function FaqSection() {
+export function FaqSection({ faqs = [] }: { faqs?: any[] }) {
+  if (!faqs || faqs.length === 0) return null;
   return (
     <section id="faq" className="py-24 bg-surface border-y border-border">
       <div className="container mx-auto max-w-4xl px-6 md:px-12">
@@ -52,11 +31,11 @@ export function FaqSection() {
         >
           <Accordion className="w-full">
             {faqs.map((faq, index) => (
-              <AccordionItem key={index} value={`item-${index}`} className="border-border">
+              <AccordionItem key={faq.id || index} value={`item-${index}`} className="border-border">
                 <AccordionTrigger className="text-left font-heading text-lg font-medium hover:text-primary transition-colors py-6">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground leading-relaxed pb-6">
+                <AccordionContent className="text-muted-foreground leading-relaxed pb-6 whitespace-pre-wrap">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
