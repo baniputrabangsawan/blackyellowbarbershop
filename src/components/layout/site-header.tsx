@@ -34,7 +34,7 @@ export function SiteHeader({ settings }: { settings?: any }) {
   return (
     <header
       className={`fixed top-0 z-50 w-full transition-all duration-300 ${
-        scrolled ? "bg-background/80 backdrop-blur-md border-b border-border/50" : "bg-transparent"
+        scrolled ? "bg-background/85 backdrop-blur-xl border-b border-border shadow-sm" : "bg-transparent"
       }`}
     >
       <div className="container mx-auto max-w-7xl px-6 md:px-12 flex h-20 items-center justify-between">
@@ -74,9 +74,10 @@ export function SiteHeader({ settings }: { settings?: any }) {
             <Link
               key={link.name}
               href={link.href}
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+              className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group py-2"
             >
               {link.name}
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary transition-all group-hover:w-full rounded-full" />
             </Link>
           ))}
           <Link href="/queue" className={cn(buttonVariants({ variant: "default" }), "rounded-full bg-primary text-primary-foreground hover:bg-primary-hover px-6")}>

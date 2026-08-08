@@ -39,9 +39,9 @@ export function HeroSection({ settings }: { settings?: any }) {
             <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Buka Hari Ini 10:00 - 21:00</span>
           </div>
 
-          <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tighter text-foreground mb-6 leading-[0.9]">
+          <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter text-foreground mb-6 leading-[0.85]">
             {title}<br />
-            <span className="text-primary">{subtitle}</span>
+            <span className="text-primary/90">{subtitle}</span>
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-10 leading-relaxed">
@@ -53,7 +53,7 @@ export function HeroSection({ settings }: { settings?: any }) {
                 <CalendarClock className="mr-2 h-5 w-5" />
                 Ambil Antrean
             </Link>
-            <Link href="#services" className={cn(buttonVariants({ size: "lg", variant: "outline" }), "w-full sm:w-auto rounded-full px-8 py-6 text-base font-medium hover:bg-white/5 border-border")}>
+            <Link href="#services" className={cn(buttonVariants({ size: "lg", variant: "outline" }), "w-full sm:w-auto rounded-full px-8 py-6 text-base font-medium hover:bg-white/5 border-border backdrop-blur-sm")}>
                 Lihat Services
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>

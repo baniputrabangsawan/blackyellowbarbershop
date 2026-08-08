@@ -36,16 +36,11 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-md bg-surface border-border shadow-xl">
-      <CardHeader className="space-y-2 text-center pb-8">
-        <div className="flex justify-center mb-4">
-          <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center">
-            <span className="font-heading font-bold text-3xl text-primary-foreground">BY</span>
-          </div>
-        </div>
-        <CardTitle className="font-heading text-2xl text-foreground">Dashboard Admin</CardTitle>
+    <Card className="w-full bg-surface/50 backdrop-blur-xl border-border/50 shadow-2xl">
+      <CardHeader className="space-y-1 pb-6">
+        <CardTitle className="font-heading text-2xl text-foreground">Login Admin</CardTitle>
         <CardDescription className="text-muted-foreground">
-          Silakan masuk untuk mengelola antrean, layanan, dan keanggotaan.
+          Masukkan kredensial Anda untuk melanjutkan.
         </CardDescription>
       </CardHeader>
       <CardContent>

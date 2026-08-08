@@ -39,12 +39,12 @@ const ServiceCard = ({ service, index }: { service: ServiceItem, index: number }
     viewport={{ once: true }}
     transition={{ delay: index * 0.1, duration: 0.5 }}
   >
-    <Card className="bg-surface border-border overflow-hidden h-full group hover:border-primary/50 transition-colors">
+    <Card className="bg-surface border-border overflow-hidden h-full group hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 hover:border-primary/50 transition-all duration-300">
       <CardContent className="p-6 flex flex-col h-full">
         <div className="flex justify-between items-start mb-4 gap-4">
           <div>
             <h3 className="font-heading font-semibold text-lg text-foreground mb-1">{service.name}</h3>
-            {service.popular && <Badge variant="default" className="bg-primary text-primary-foreground text-xs uppercase tracking-wider mb-2">Terpopuler</Badge>}
+            {service.popular && <Badge variant="default" className="bg-primary/20 text-primary hover:bg-primary/30 border-none text-xs uppercase tracking-wider mb-2 transition-colors">Terpopuler</Badge>}
           </div>
           <div className="text-primary font-bold whitespace-nowrap">{service.price}</div>
         </div>

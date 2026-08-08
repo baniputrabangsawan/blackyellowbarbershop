@@ -104,7 +104,7 @@ export function BarberSection() {
                 transition={{ delay: index * 0.1, duration: 0.5 }}
                 className="w-full md:w-1/3 shrink-0 px-4"
               >
-                <Card className="bg-surface border-border overflow-hidden group h-full shadow-lg">
+                <Card className="bg-surface border-border overflow-hidden group h-full shadow-lg hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 hover:border-primary/50 transition-all duration-300">
                   <div className="relative aspect-[4/5] overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
                     <Image

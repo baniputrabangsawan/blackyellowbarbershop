@@ -61,12 +61,12 @@ export function SettingsForm({ initialData }: { initialData: SettingsData }) {
       )}
 
       <Tabs defaultValue="operational" className="w-full">
-        <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full mb-6 bg-surface-elevated overflow-x-auto h-auto p-1">
-          <TabsTrigger value="operational" className="py-2.5">Operasional</TabsTrigger>
-          <TabsTrigger value="business" className="py-2.5">Info Bisnis</TabsTrigger>
-          <TabsTrigger value="queue" className="py-2.5">Antrean</TabsTrigger>
-          <TabsTrigger value="membership" className="py-2.5">Membership</TabsTrigger>
-          <TabsTrigger value="branding" className="py-2.5">Branding</TabsTrigger>
+        <TabsList className="flex w-full mb-6 bg-surface-elevated overflow-x-auto flex-nowrap snap-x justify-start h-auto p-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <TabsTrigger value="operational" className="py-2.5 px-4 shrink-0 snap-start">Operasional</TabsTrigger>
+          <TabsTrigger value="business" className="py-2.5 px-4 shrink-0 snap-start">Info Bisnis</TabsTrigger>
+          <TabsTrigger value="queue" className="py-2.5 px-4 shrink-0 snap-start">Antrean</TabsTrigger>
+          <TabsTrigger value="membership" className="py-2.5 px-4 shrink-0 snap-start">Membership</TabsTrigger>
+          <TabsTrigger value="branding" className="py-2.5 px-4 shrink-0 snap-start">Branding</TabsTrigger>
         </TabsList>
 
         <TabsContent value="operational" className="space-y-6">
