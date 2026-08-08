@@ -56,22 +56,33 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getPublicSettings();
+
+  // Kumpulkan social media links untuk sameAs
+  const sameAs: string[] = [];
+  if (settings?.instagram_url) sameAs.push(settings.instagram_url);
+  if (settings?.facebook_url) sameAs.push(settings.facebook_url);
+  if (settings?.tiktok_url) sameAs.push(settings.tiktok_url);
+
   // JSON-LD untuk LocalBusiness & HairSalon Schema
-  const jsonLd = {
+  const businessJsonLd = {
     "@context": "https://schema.org",
     "@type": ["LocalBusiness", "HairSalon"],
     "name": "Black Yellow Barbershop",
     "image": "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=2074&auto=format&fit=crop",
-    "@id": `${baseUrl}`,
+    "@id": `${baseUrl}/#business`,
     "url": baseUrl,
-    "telephone": "080000000000",
+    ...(settings?.whatsapp || settings?.phone
+      ? { "telephone": settings.whatsapp || settings.phone }
+      : {}),
     "address": {
       "@type": "PostalAddress",
+      "streetAddress": settings?.address || undefined,
       "addressLocality": "Makassar",
       "addressRegion": "Sulawesi Selatan",
       "addressCountry": "ID"
@@ -80,6 +91,10 @@ export default function RootLayout({
       "@type": "GeoCoordinates",
       "latitude": -5.147665,
       "longitude": 119.432731
+    },
+    "areaServed": {
+      "@type": "City",
+      "name": "Makassar"
     },
     "openingHoursSpecification": [
       {
@@ -95,7 +110,16 @@ export default function RootLayout({
         "closes": "22:00"
       }
     ],
-    "priceRange": "$$"
+    "priceRange": "$$",
+    ...(sameAs.length > 0 ? { "sameAs": sameAs } : {})
+  };
+
+  // WebSite schema — membantu Google menampilkan sitelinks
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Black Yellow Barbershop",
+    "url": baseUrl
   };
 
   return (
@@ -106,7 +130,11 @@ export default function RootLayout({
       <body className="min-h-dvh flex flex-col font-sans bg-background text-foreground">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(businessJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
         {children}
       </body>

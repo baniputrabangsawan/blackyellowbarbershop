@@ -20,7 +20,7 @@ export function SiteFooter({ settings }: { settings?: any }) {
               </span>
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-              {settings?.brand_tagline || "Potongan presisi dan gaya tanpa kompromi. Kami hadir untuk memberikan pengalaman pangkas rambut terbaik di kota Anda."}
+              {settings?.brand_tagline || "Potongan presisi dan gaya tanpa kompromi. Pengalaman pangkas rambut terbaik di Makassar."}
             </p>
             <div className="flex gap-4">
               {settings?.instagram_url && (

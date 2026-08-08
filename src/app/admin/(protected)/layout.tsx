@@ -19,24 +19,34 @@ export const metadata = {
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
 
-  if (error || !user) {
+  // Langkah 1: Baca session dari cookie secara lokal (cepat, tanpa network request)
+  // Ini hanya untuk mendapat user.id agar bisa query admin_users secara paralel
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
     redirect("/admin/login");
   }
 
-  // Cek apakah user ada di tabel admin_users
-  const { data: adminUser, error: adminError } = await supabase
-    .from("admin_users")
-    .select("role")
-    .eq("user_id", user.id)
-    .single();
+  // Langkah 2: Jalankan validasi server (getUser) dan pengecekan DB secara PARALEL
+  // getUser() memvalidasi token ke Supabase Auth Server
+  // admin_users query menggunakan session.user.id yang sudah kita dapat di langkah 1
+  const [{ data: { user }, error }, { data: adminUser, error: adminError }] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase.from("admin_users").select("role").eq("user_id", session.user.id).single(),
+  ]);
+
+  // Validasi hasil — logika keamanan tetap sama persis
+  if (error || !user) {
+    redirect("/admin/login");
+  }
 
   if (adminError || !adminUser) {
     // Memaksa logout jika bukan admin
     await supabase.auth.signOut();
     redirect("/admin/login");
   }
+
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">

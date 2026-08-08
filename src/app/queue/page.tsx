@@ -4,8 +4,8 @@ import { getQueueOptions, getStoreQueueState } from "@/actions/queue";
 import { QueueForm } from "./queue-form";
 
 export const metadata = {
-  title: "Ambil Antrean | Black Yellow Barbershop",
-  description: "Daftar antrean secara online untuk menghemat waktu Anda.",
+  title: "Ambil Antrean Online | Black Yellow Barbershop Makassar",
+  description: "Daftar antrean online di Black Yellow Barbershop Makassar. Hemat waktu, pantau giliran secara realtime dari ponsel Anda.",
 };
 
 export default async function QueuePage() {

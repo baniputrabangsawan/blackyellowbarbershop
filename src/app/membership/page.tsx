@@ -5,8 +5,8 @@ import { MembershipForm } from "./membership-form";
 import { ShieldCheck, Star, Clock } from "lucide-react";
 
 export const metadata = {
-  title: "Membership | Black Yellow Barbershop",
-  description: "Bergabunglah menjadi member eksklusif dan nikmati berbagai keuntungan menarik di Black Yellow Barbershop.",
+  title: "Membership | Black Yellow Barbershop Makassar",
+  description: "Bergabung menjadi member eksklusif Black Yellow Barbershop Makassar. Nikmati diskon layanan, prioritas antrean, dan promo khusus member.",
 };
 
 export default async function MembershipPage() {

@@ -23,6 +23,7 @@ export function HeroSection({ settings }: { settings?: any }) {
           alt="Interior Black Yellow Barbershop Makassar - Tempat cukur rambut premium"
           fill
           priority
+          sizes="100vw"
           className="object-cover object-center"
         />
       </div>
@@ -56,7 +57,7 @@ export function HeroSection({ settings }: { settings?: any }) {
           </div>
 
           <h1 className="flex flex-col gap-3 mb-6">
-            <span className="text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-primary">
+            <span className="sr-only">
               Black Yellow Barbershop Makassar
             </span>
             <span className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter text-foreground leading-[0.85]">
