@@ -1,8 +1,9 @@
-"use server";
+import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
+import { cache } from "react";
 
-export async function getPublicSettings() {
+export const getPublicSettings = cache(async function getPublicSettings() {
   const supabase = await createClient();
   const { data: siteSettings } = await supabase
     .from("site_settings")
@@ -15,7 +16,7 @@ export async function getPublicSettings() {
     hero_subtitle: "Gaya Tanpa Kompromi.",
     hero_description: "Lebih dari sekadar pangkas rambut. Kami menghadirkan pengalaman premium dengan barber profesional untuk tampilan terbaik Anda."
   };
-}
+});
 
 export async function getPublicGalleries() {
   const supabase = await createClient();
@@ -56,4 +57,3 @@ export async function getPublicPromos() {
     return isStarted && isNotExpired;
   });
 }
-

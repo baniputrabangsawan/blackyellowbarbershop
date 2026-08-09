@@ -22,14 +22,26 @@ export function QueuePreviewSection() {
   useEffect(() => {
     let globalSubscription: any = null;
     let pollInterval: NodeJS.Timeout | null = null;
+    let isPolling = false;
+    let isDisposed = false;
+
+    const fetchQueueStatus = async (branchId: string) => {
+      const [liveStatus, storeState] = await Promise.all([
+        getLiveQueueStatus(branchId),
+        getStoreQueueState(branchId),
+      ]);
+
+      return { ...liveStatus, storeState };
+    };
 
     const fetchInitialData = async () => {
       // Fetch the first active branch to show its queue
       const { data: branchData } = await supabase.from("branches").select("id").eq("is_active", true).limit(1).single();
-      if (branchData) {
-        const initialStatus = await getLiveQueueStatus(branchData.id);
-        const storeState = await getStoreQueueState(branchData.id);
-        setStatus({ ...initialStatus, storeState });
+      if (branchData && !isDisposed) {
+        const initialStatus = await fetchQueueStatus(branchData.id);
+        if (isDisposed) return;
+
+        setStatus(initialStatus);
         setIsLoading(false);
 
         // Subscribe to real-time updates for this branch's queues
@@ -43,10 +55,13 @@ export function QueuePreviewSection() {
               table: 'queues'
             },
             async () => {
+              if (isDisposed) return;
+
               // Re-fetch the simplified status when any queue changes
-              const newStatus = await getLiveQueueStatus(branchData.id);
-              const storeState = await getStoreQueueState(branchData.id);
-              setStatus({ ...newStatus, storeState });
+              const newStatus = await fetchQueueStatus(branchData.id);
+              if (isDisposed) return;
+
+              setStatus(newStatus);
             }
           )
           .on(
@@ -57,40 +72,48 @@ export function QueuePreviewSection() {
               table: 'site_settings'
             },
             async () => {
+              if (isDisposed) return;
+
               // Update store state when admin changes settings
               const storeState = await getStoreQueueState(branchData.id);
+              if (isDisposed) return;
+
               setStatus(prev => ({ ...prev, storeState }));
             }
           )
           .subscribe();
 
-        // Fallback: Polling every 5 seconds to guarantee it auto-updates
-        // This is robust against any WebSocket or Supabase Realtime configuration issues
+        // Realtime is the primary update mechanism. Poll less frequently as a fallback.
         pollInterval = setInterval(async () => {
+          if (isDisposed || isPolling) return;
+          isPolling = true;
+
           try {
-            const newStatus = await getLiveQueueStatus(branchData.id);
-            const storeState = await getStoreQueueState(branchData.id);
+            const newStatus = await fetchQueueStatus(branchData.id);
             
             setStatus(prev => {
               if (
                 prev.currentNumber !== newStatus.currentNumber || 
                 prev.waitingCount !== newStatus.waitingCount ||
-                prev.storeState !== storeState
+                prev.storeState !== newStatus.storeState
               ) {
-                return { ...newStatus, storeState };
+                return newStatus;
               }
               return prev;
             });
           } catch (e) {
             console.error("Polling error", e);
+          } finally {
+            isPolling = false;
           }
-        }, 5000);
+        }, 30000);
       }
     };
 
     fetchInitialData();
 
     return () => {
+      isDisposed = true;
       if (globalSubscription) {
         supabase.removeChannel(globalSubscription);
       }

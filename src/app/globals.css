@@ -122,6 +122,8 @@
   }
   html {
     @apply font-sans;
+  }
+  html:not(.lenis) {
     scroll-behavior: smooth;
   }
 }

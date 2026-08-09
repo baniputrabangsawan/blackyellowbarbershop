@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import "lenis/dist/lenis.css";
+
+import { SmoothScrollProvider } from "@/components/motion/smooth-scroll-provider";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -125,9 +128,11 @@ export default async function RootLayout({
   return (
     <html
       lang="id"
+      data-scroll-behavior="smooth"
       className={`${inter.variable} ${spaceGrotesk.variable} dark antialiased`}
     >
       <body className="min-h-dvh flex flex-col font-sans bg-background text-foreground">
+        <SmoothScrollProvider />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(businessJsonLd) }}

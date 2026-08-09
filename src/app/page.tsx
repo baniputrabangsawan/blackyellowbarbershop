@@ -26,7 +26,7 @@ export default async function Home() {
       <RealtimeRefresh />
       <PromoBanner key={promos[0]?.id || 'none'} promos={promos} />
       <SiteHeader settings={settings} />
-      <main className="flex-1 w-full flex flex-col">
+      <main className="flex w-full flex-1 flex-col">
         <HeroSection settings={settings} />
         <ServicesSection />
         <QueuePreviewSection />

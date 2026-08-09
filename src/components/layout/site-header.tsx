@@ -22,19 +22,26 @@ const navLinks = [
 export function SiteHeader({ settings }: { settings?: any }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
+  const scrolledRef = React.useRef(false);
 
   React.useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      const nextScrolled = window.scrollY > 50;
+      if (nextScrolled === scrolledRef.current) return;
+
+      scrolledRef.current = nextScrolled;
+      setScrolled(nextScrolled);
     };
-    window.addEventListener("scroll", handleScroll);
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <header
       className={`fixed top-0 z-50 w-full transition-all duration-300 ${
-        scrolled ? "bg-background/85 backdrop-blur-xl border-b border-border shadow-sm" : "bg-transparent"
+        scrolled ? "bg-background/95 border-b border-border shadow-sm" : "bg-transparent"
       }`}
     >
       <div className="container mx-auto max-w-7xl px-6 md:px-12 flex h-20 items-center justify-between">

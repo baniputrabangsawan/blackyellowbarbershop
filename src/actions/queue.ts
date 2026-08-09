@@ -99,24 +99,25 @@ export async function getLiveQueueStatus(branchId: string) {
   const today = new Date().toLocaleString("en-US", { timeZone: "Asia/Makassar" });
   const todayDateStr = new Date(today).toISOString().split("T")[0];
   
-  // Dapatkan antrean yang sedang dipanggil / dilayani (maksimal 1 terbaru)
-  const { data: currentQueue } = await supabase
-    .from("queues")
-    .select("queue_number")
-    .eq("branch_id", branchId)
-    .eq("queue_date", todayDateStr)
-    .in("status", ["called", "in_service"])
-    .order("called_at", { ascending: false, nullsFirst: false })
-    .limit(1)
-    .single();
-
-  // Dapatkan jumlah yang sedang menunggu
-  const { count: waitingCount } = await supabase
-    .from("queues")
-    .select("id", { count: "exact", head: true })
-    .eq("branch_id", branchId)
-    .eq("queue_date", todayDateStr)
-    .eq("status", "waiting");
+  const [{ data: currentQueue }, { count: waitingCount }] = await Promise.all([
+    // Dapatkan antrean yang sedang dipanggil / dilayani (maksimal 1 terbaru)
+    supabase
+      .from("queues")
+      .select("queue_number")
+      .eq("branch_id", branchId)
+      .eq("queue_date", todayDateStr)
+      .in("status", ["called", "in_service"])
+      .order("called_at", { ascending: false, nullsFirst: false })
+      .limit(1)
+      .maybeSingle(),
+    // Dapatkan jumlah yang sedang menunggu
+    supabase
+      .from("queues")
+      .select("id", { count: "exact", head: true })
+      .eq("branch_id", branchId)
+      .eq("queue_date", todayDateStr)
+      .eq("status", "waiting"),
+  ]);
 
   const currentNumber = currentQueue ? currentQueue.queue_number : null;
   const actualWaitingCount = waitingCount || 0;
@@ -139,23 +140,24 @@ export async function getStoreQueueState(branchId: string): Promise<'open' | 'cl
     // const makassarTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Makassar" }));
     // const dayOfWeek = makassarTime.getDay(); // 0 is Sunday (temporarily unused)
     
-    // Check if the branch is manually closed by the admin (is_active = false)
-    const { data: branch } = await supabase
-      .from("branches")
-      .select("is_active")
-      .eq("id", branchId)
-      .single();
+    const [{ data: branch }, { data: settings }] = await Promise.all([
+      // Check if the branch is manually closed by the admin (is_active = false)
+      supabase
+        .from("branches")
+        .select("is_active")
+        .eq("id", branchId)
+        .single(),
+      // Check Global Site Settings from Admin Dashboard
+      supabase
+        .from("site_settings")
+        .select("is_open, operational_status, accept_new_queue")
+        .limit(1)
+        .maybeSingle(),
+    ]);
 
     if (branch && branch.is_active === false) {
       return 'closed';
     }
-
-    // Check Global Site Settings from Admin Dashboard
-    const { data: settings } = await supabase
-      .from("site_settings")
-      .select("is_open, operational_status, accept_new_queue")
-      .limit(1)
-      .maybeSingle();
 
     if (settings) {
       if (settings.is_open === false) return 'closed';
