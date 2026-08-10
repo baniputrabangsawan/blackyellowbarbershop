@@ -2,15 +2,29 @@
 
 import { useEffect, useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
+import { isStoreOpenAtCurrentTime } from "@/lib/utils";
 
 export function useRealtimeSettings<T>(initialSettings: T) {
   const [settings, setSettings] = useState(initialSettings);
   const [prevInitialSettings, setPrevInitialSettings] = useState(initialSettings);
+  const [isTimeOpen, setIsTimeOpen] = useState(true);
 
   if (initialSettings !== prevInitialSettings) {
     setPrevInitialSettings(initialSettings);
     setSettings(initialSettings);
   }
+
+  useEffect(() => {
+    // Initial check
+    setIsTimeOpen(isStoreOpenAtCurrentTime());
+    
+    // Check every minute
+    const interval = setInterval(() => {
+      setIsTimeOpen(isStoreOpenAtCurrentTime());
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const supabase = createBrowserClient(
@@ -37,5 +51,14 @@ export function useRealtimeSettings<T>(initialSettings: T) {
     };
   }, []);
 
-  return settings;
+  // Override settings if store should be closed by time
+  const augmentedSettings = { ...settings } as any;
+  if (augmentedSettings && typeof augmentedSettings.is_open !== 'undefined') {
+    if (!isTimeOpen) {
+      augmentedSettings.is_open = false;
+      augmentedSettings.operational_status = "Tutup (Luar Jam Operasional)";
+    }
+  }
+
+  return augmentedSettings as T;
 }

@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { MapPin, Phone } from "lucide-react";
 import { useRealtimeSettings } from "@/hooks/use-settings";
+import { cn } from "@/lib/utils";
 
 export function SiteFooter({ settings: initialSettings }: { settings?: any }) {
   const settings = useRealtimeSettings(initialSettings || {});
@@ -60,35 +61,41 @@ export function SiteFooter({ settings: initialSettings }: { settings?: any }) {
             <h4 className="font-heading font-semibold mb-6 uppercase tracking-wider text-sm text-foreground">Jam Buka</h4>
             <ul className="space-y-4 text-sm text-muted-foreground">
               <li className="flex justify-between items-center">
-                <span>Senin - Jumat</span>
-                <span className="text-foreground font-medium">10:00 - 21:00</span>
+                <span>Senin - Kamis</span>
+                <span className="text-foreground font-medium">10:00 - 22:00</span>
+              </li>
+              <li className="flex justify-between items-center">
+                <span>Jumat</span>
+                <span className="text-foreground font-medium">13:00 - 22:00</span>
               </li>
               <li className="flex justify-between items-center">
                 <span>Sabtu - Minggu</span>
-                <span className="text-foreground font-medium">09:00 - 22:00</span>
+                <span className="text-foreground font-medium">10:00 - 22:00</span>
               </li>
               <li className="flex justify-between items-center text-primary mt-2">
                 <span>Status Saat Ini</span>
-                <span className={`font-semibold px-2 py-1 rounded-md ${
+                <div className={cn(
+                  "px-3 py-1 rounded-full text-xs font-semibold",
                   (() => {
-                    const status = (settings?.operational_status || (settings?.is_open === false ? 'Tutup' : 'Buka')).toUpperCase();
+                    const statusText = settings?.is_open === false ? 'Tutup' : (settings?.operational_status || 'Buka');
+                    const status = statusText.toUpperCase();
                     if (status === 'ANTREAN PENUH' || status === 'TUTUP' || status === 'MAINTENANCE') return "bg-red-500/10 text-red-500";
                     if (status === 'ISTIRAHAT') return "bg-yellow-500/10 text-yellow-500";
                     return "bg-green-500/10 text-green-500";
                   })()
-                }`}>
-                  {settings?.operational_status || (settings?.is_open === false ? 'Tutup' : 'Buka')}
-                </span>
+                )}>
+                  {settings?.is_open === false ? 'Tutup' : (settings?.operational_status || 'Buka')}
+                </div>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-heading font-semibold mb-6 uppercase tracking-wider text-sm text-foreground">Kontak</h4>
+            <h4 className="font-heading font-semibold mb-6 uppercase tracking-wider text-sm text-foreground">Lokasi</h4>
             <ul className="space-y-4 text-sm text-muted-foreground">
               <li className="flex items-start gap-3">
                 <MapPin size={18} className="text-primary shrink-0 mt-0.5" />
-                <span>{settings?.address || "Jl. AP. Pettarani No. 123, Makassar, Sulawesi Selatan"}</span>
+                <span>Kabupaten Gowa, Makassar, Indonesia</span>
               </li>
               {(settings?.phone || settings?.whatsapp) && (
                 <li className="flex items-center gap-3">

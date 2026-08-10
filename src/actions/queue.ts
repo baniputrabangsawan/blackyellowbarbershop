@@ -180,6 +180,11 @@ export async function getStoreQueueState(branchId: string): Promise<'open' | 'cl
       return 'closed';
     }
 
+    const { isStoreOpenAtCurrentTime } = await import('@/lib/utils');
+    if (!isStoreOpenAtCurrentTime()) {
+      return 'closed';
+    }
+
     if (settings) {
       if (settings.is_open === false) return 'closed';
       if (settings.accept_new_queue === false) return 'closed';

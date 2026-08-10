@@ -41,19 +41,17 @@ export function LocationSection({ settings }: { settings?: any }) {
                         <div>
                           <p className="font-medium text-foreground text-sm mb-1.5">{settings?.branch_name || "Makassar (Pusat)"}</p>
                           <p className="text-muted-foreground text-sm leading-relaxed">
-                            {settings?.address || "Jl. AP. Pettarani No. 123, Makassar"}
+                            {settings?.address || "Jl. AP. Pettarani No. 123, Makassar, Sulawesi Selatan, Indonesia"}
                           </p>
                         </div>
-                        {!settings?.address && (
-                          <div>
+                        <div className="pt-2 border-t border-border/50">
                           <p className="font-medium text-foreground text-sm mb-1.5">Gowa</p>
                           <p className="text-muted-foreground text-sm leading-relaxed">
                             Jl. Andi Tonro No.64D, Bonto Bontoa<br />
                             Kec. Somba Opu, Kabupaten Gowa<br />
-                            Sulawesi Selatan 92113
+                            Sulawesi Selatan 92113, Indonesia
                           </p>
                         </div>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -64,14 +62,18 @@ export function LocationSection({ settings }: { settings?: any }) {
                     </div>
                     <div>
                       <h3 className="font-heading font-semibold text-lg mb-1 text-foreground">Jam Operasional</h3>
-                      <div className="space-y-1 text-sm text-muted-foreground">
-                        <div className="flex justify-between w-48">
-                          <span>Senin - Jumat:</span>
-                          <span className="font-medium text-foreground">10:00 - 21:00</span>
+                      <div className="space-y-2 text-sm text-muted-foreground">
+                        <div className="flex justify-between w-56">
+                          <span>Senin - Kamis:</span>
+                          <span className="font-medium text-foreground">10:00 - 22:00</span>
                         </div>
-                        <div className="flex justify-between w-48">
+                        <div className="flex justify-between w-56">
+                          <span>Jumat:</span>
+                          <span className="font-medium text-foreground">13:00 - 22:00</span>
+                        </div>
+                        <div className="flex justify-between w-56">
                           <span>Sabtu - Minggu:</span>
-                          <span className="font-medium text-foreground">09:00 - 22:00</span>
+                          <span className="font-medium text-foreground">10:00 - 22:00</span>
                         </div>
                       </div>
                     </div>

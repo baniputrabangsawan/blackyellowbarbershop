@@ -69,13 +69,14 @@ export function SiteHeader({ settings: initialSettings }: { settings?: any }) {
             <span className={cn(
               "text-xs font-bold px-2 py-1 rounded-md border uppercase tracking-wider",
               (() => {
-                const status = (settings.operational_status || (settings.is_open ? 'Buka' : 'Tutup')).toUpperCase();
+                const statusText = settings.is_open === false ? 'Tutup' : (settings.operational_status || 'Buka');
+                const status = statusText.toUpperCase();
                 if (status === 'ANTREAN PENUH' || status === 'TUTUP' || status === 'MAINTENANCE') return "bg-red-500/10 text-red-500 border-red-500/20";
                 if (status === 'ISTIRAHAT') return "bg-yellow-500/10 text-yellow-500 border-yellow-500/20";
                 return "bg-green-500/10 text-green-500 border-green-500/20";
               })()
             )}>
-              {settings.operational_status || (settings.is_open ? 'BUKA' : 'TUTUP')}
+              {settings.is_open === false ? 'TUTUP' : (settings.operational_status || 'BUKA').toUpperCase()}
             </span>
           </div>
         )}

@@ -1,10 +1,8 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { buttonVariants } from "@/components/ui/button";
-import { motion, AnimatePresence } from "motion/react";
-import { useState } from "react";
+import { motion } from "motion/react";
 import { ArrowRight, Check, Clock } from "lucide-react";
 import Link from "next/link";
 
@@ -25,16 +23,6 @@ const coreCutBenefits = [
 ];
 
 const servicesData: Record<string, ServiceItem[]> = {
-  haircut: [
-    { name: "Black Cut", desc: "Potongan rambut presisi dengan konsultasi gaya, cuci, dan styling pomade.", price: "Rp 60.000", duration: "45 Menit", popular: true },
-    { name: "Student Cut", desc: "Potongan rapi khusus pelajar dengan menunjukkan kartu pelajar aktif.", price: "Rp 45.000", duration: "30 Menit" },
-    { name: "Kids Cut", desc: "Pangkas rambut anak-anak (di bawah 12 tahun) dengan perlakuan khusus.", price: "Rp 50.000", duration: "45 Menit" },
-  ],
-  grooming: [
-    { name: "Yellow Grooming", desc: "Cukur kumis/jenggot lengkap dengan hot towel dan pijat ringan.", price: "Rp 40.000", duration: "30 Menit" },
-    { name: "Hair Wash & Styling", desc: "Cuci rambut premium, tonik, dan styling dengan pomade pilihan.", price: "Rp 35.000", duration: "20 Menit" },
-    { name: "Hair Color", desc: "Pewarnaan rambut dasar (hitam/cokelat gelap).", price: "Mulai Rp 150.000", duration: "90 Menit" },
-  ],
   package: [
     { name: "Junior Cuts", price: "Rp35.000", features: [...coreCutBenefits] },
     { name: "Bronze Cuts", price: "Rp40.000", features: [...coreCutBenefits] },
@@ -69,10 +57,10 @@ const ServiceCard = ({
     }`}
   >
     <Card
-      className={`group relative h-full gap-0 overflow-hidden border bg-surface py-0 ring-0 transition-[transform,border-color,box-shadow] duration-300 motion-reduce:transition-none md:hover:-translate-y-1 md:hover:shadow-xl md:hover:shadow-black/20 ${
+      className={`group relative h-full gap-0 overflow-hidden border bg-surface py-0 ring-0 transition-all duration-500 ease-out motion-reduce:transition-none md:hover:-translate-y-1.5 md:hover:shadow-[0_10px_40px_-15px_rgba(0,0,0,0.7)] ${
         service.popular
-          ? "border-primary/60"
-          : "border-border md:hover:border-primary/35"
+          ? "border-primary/60 md:hover:border-primary"
+          : "border-border md:hover:border-primary/50"
       }`}
     >
       <div
@@ -144,8 +132,6 @@ const ServiceCard = ({
 );
 
 export function ServicesSection() {
-  const [activeTab, setActiveTab] = useState("haircut");
-
   return (
     <section id="services" className="py-24 bg-background">
       <div className="container mx-auto max-w-7xl px-6 md:px-12">
@@ -154,66 +140,22 @@ export function ServicesSection() {
             Layanan <span className="text-primary">Kami</span>
           </h2>
           <p className="text-muted-foreground md:text-lg">
-            Pilih layanan yang sesuai dengan kebutuhan Anda. Harga dan durasi tertera adalah estimasi dasar.
+            Pilih paket layanan yang sesuai dengan kebutuhan Anda.
           </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="flex justify-center mb-12">
-            <TabsList className="bg-surface-elevated border border-border p-1 relative">
-              <TabsTrigger value="haircut" className="relative data-[state=active]:text-primary-foreground data-[state=active]:bg-transparent px-6 py-2 rounded-md font-medium transition-colors">
-                {activeTab === "haircut" && (
-                  <motion.div layoutId="activeTabIndicator" className="absolute inset-0 bg-primary rounded-md" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />
-                )}
-                <span className="relative z-10">Haircut</span>
-              </TabsTrigger>
-              <TabsTrigger value="grooming" className="relative data-[state=active]:text-primary-foreground data-[state=active]:bg-transparent px-6 py-2 rounded-md font-medium transition-colors">
-                {activeTab === "grooming" && (
-                  <motion.div layoutId="activeTabIndicator" className="absolute inset-0 bg-primary rounded-md" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />
-                )}
-                <span className="relative z-10">Grooming</span>
-              </TabsTrigger>
-              <TabsTrigger value="package" className="relative data-[state=active]:text-primary-foreground data-[state=active]:bg-transparent px-6 py-2 rounded-md font-medium transition-colors">
-                {activeTab === "package" && (
-                  <motion.div layoutId="activeTabIndicator" className="absolute inset-0 bg-primary rounded-md" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />
-                )}
-                <span className="relative z-10">Package</span>
-              </TabsTrigger>
-            </TabsList>
+        <div className="relative min-h-[400px]">
+          <div className="grid grid-cols-1 items-stretch gap-5 md:grid-cols-2 lg:gap-6 xl:grid-cols-6">
+            {servicesData.package?.map((service, idx) => (
+              <ServiceCard
+                key={service.name}
+                service={service}
+                index={idx}
+                isPackage={true}
+              />
+            ))}
           </div>
-
-          <div className="relative min-h-[400px]">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="w-full"
-              >
-                <TabsContent value={activeTab} className="mt-0 outline-none w-full data-[state=inactive]:hidden block">
-                  <div
-                    className={
-                      activeTab === "package"
-                        ? "grid grid-cols-1 items-stretch gap-5 md:grid-cols-2 lg:gap-6 xl:grid-cols-6"
-                        : "grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3"
-                    }
-                  >
-                    {servicesData[activeTab]?.map((service, idx) => (
-                      <ServiceCard
-                        key={service.name}
-                        service={service}
-                        index={idx}
-                        isPackage={activeTab === "package"}
-                      />
-                    ))}
-                  </div>
-                </TabsContent>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </Tabs>
+        </div>
       </div>
     </section>
   );
