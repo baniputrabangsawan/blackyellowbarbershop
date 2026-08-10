@@ -45,8 +45,9 @@ export function QueuePreviewSection() {
         setIsLoading(false);
 
         // Subscribe to real-time updates for this branch's queues
+        const channelId = typeof window !== 'undefined' ? Math.random().toString(36).substring(2) : Date.now();
         globalSubscription = supabase
-          .channel(`global-queues-preview-${Date.now()}`)
+          .channel(`global-queues-preview-${channelId}`)
           .on(
             'postgres_changes',
             {
@@ -176,15 +177,18 @@ export function QueuePreviewSection() {
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
                           <span className="relative inline-flex rounded-full h-3 w-3 bg-success"></span>
                         </>
+                      ) : status.storeState === 'full' ? (
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
                       ) : (
                         <span className="relative inline-flex rounded-full h-3 w-3 bg-destructive"></span>
                       )}
                     </span>
                     <span className={`text-sm font-bold uppercase tracking-wider ${
                       isLoading ? 'text-muted-foreground' : 
-                      status.storeState === 'open' ? 'text-success' : 'text-destructive'
+                      status.storeState === 'open' ? 'text-success' : 
+                      status.storeState === 'full' ? 'text-yellow-500' : 'text-destructive'
                     }`}>
-                      {isLoading ? 'Menghubungkan...' : status.storeState === 'open' ? 'Live Update' : 'Toko Tutup'}
+                      {isLoading ? 'Menghubungkan...' : status.storeState === 'open' ? 'Live Update' : status.storeState === 'full' ? 'Antrean Penuh' : 'Toko Tutup'}
                     </span>
                   </div>
                   <span className="text-xs text-muted-foreground">Otomatis Diperbarui</span>

@@ -1,8 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
 import Link from "next/link";
 import { MapPin, Phone } from "lucide-react";
+import { useRealtimeSettings } from "@/hooks/use-settings";
 
-export function SiteFooter({ settings }: { settings?: any }) {
+export function SiteFooter({ settings: initialSettings }: { settings?: any }) {
+  const settings = useRealtimeSettings(initialSettings || {});
   return (
     <footer className="bg-surface-elevated pt-20 pb-10 border-t border-border">
       <div className="container mx-auto max-w-7xl px-6 md:px-12">
@@ -66,12 +70,12 @@ export function SiteFooter({ settings }: { settings?: any }) {
               <li className="flex justify-between items-center text-primary mt-2">
                 <span>Status Saat Ini</span>
                 <span className={`font-semibold px-2 py-1 rounded-md ${
-                  settings?.is_open === false || 
-                  settings?.operational_status === 'Istirahat' || 
-                  settings?.operational_status === 'Antrean Penuh' || 
-                  settings?.operational_status === 'Maintenance'
-                    ? 'bg-destructive/10 text-destructive' 
-                    : 'bg-primary/10 text-primary'
+                  (() => {
+                    const status = (settings?.operational_status || (settings?.is_open === false ? 'Tutup' : 'Buka')).toUpperCase();
+                    if (status === 'ANTREAN PENUH' || status === 'TUTUP' || status === 'MAINTENANCE') return "bg-red-500/10 text-red-500";
+                    if (status === 'ISTIRAHAT') return "bg-yellow-500/10 text-yellow-500";
+                    return "bg-green-500/10 text-green-500";
+                  })()
                 }`}>
                   {settings?.operational_status || (settings?.is_open === false ? 'Tutup' : 'Buka')}
                 </span>

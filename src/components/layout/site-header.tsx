@@ -8,6 +8,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { useRealtimeSettings } from "@/hooks/use-settings";
 
 const navLinks = [
   { name: "Beranda", href: "/#hero" },
@@ -19,7 +20,8 @@ const navLinks = [
   { name: "Lokasi", href: "/#location" },
 ];
 
-export function SiteHeader({ settings }: { settings?: any }) {
+export function SiteHeader({ settings: initialSettings }: { settings?: any }) {
+  const settings = useRealtimeSettings(initialSettings || {});
   const [isOpen, setIsOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
   const scrolledRef = React.useRef(false);
@@ -66,9 +68,12 @@ export function SiteHeader({ settings }: { settings?: any }) {
           <div className="hidden md:flex ml-4 mr-auto items-center">
             <span className={cn(
               "text-xs font-bold px-2 py-1 rounded-md border uppercase tracking-wider",
-              settings.is_open 
-                ? "bg-green-500/10 text-green-500 border-green-500/20" 
-                : "bg-red-500/10 text-red-500 border-red-500/20"
+              (() => {
+                const status = (settings.operational_status || (settings.is_open ? 'Buka' : 'Tutup')).toUpperCase();
+                if (status === 'ANTREAN PENUH' || status === 'TUTUP' || status === 'MAINTENANCE') return "bg-red-500/10 text-red-500 border-red-500/20";
+                if (status === 'ISTIRAHAT') return "bg-yellow-500/10 text-yellow-500 border-yellow-500/20";
+                return "bg-green-500/10 text-green-500 border-green-500/20";
+              })()
             )}>
               {settings.operational_status || (settings.is_open ? 'BUKA' : 'TUTUP')}
             </span>

@@ -11,6 +11,8 @@ import { getPublicSettings, getPublicGalleries, getPublicFaqs, getPublicPromos }
 import { PromoBanner } from "@/components/sections/promo-banner";
 import { RealtimeRefresh } from "@/components/realtime-refresh";
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   // Jalankan semua query database secara paralel, bukan berurutan
   // Ini memotong waktu tunggu server dari ~800ms menjadi ~200ms

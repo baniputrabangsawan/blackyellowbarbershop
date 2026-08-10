@@ -131,7 +131,7 @@ export async function getLiveQueueStatus(branchId: string) {
   };
 }
 
-export async function getStoreQueueState(branchId: string): Promise<'open' | 'closed' | 'offline'> {
+export async function getStoreQueueState(branchId: string): Promise<'open' | 'closed' | 'offline' | 'full'> {
   try {
     const supabase = await createClient();
     
@@ -140,7 +140,15 @@ export async function getStoreQueueState(branchId: string): Promise<'open' | 'cl
     // const makassarTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Makassar" }));
     // const dayOfWeek = makassarTime.getDay(); // 0 is Sunday (temporarily unused)
     
-    const [{ data: branch }, { data: settings }] = await Promise.all([
+    const today = new Date().toLocaleString("en-US", { timeZone: "Asia/Makassar" });
+    const todayDateStr = new Date(today).toISOString().split("T")[0];
+
+    const [
+      { data: branch }, 
+      { data: settings },
+      { count: todayTotalCount },
+      { count: waitingCount }
+    ] = await Promise.all([
       // Check if the branch is manually closed by the admin (is_active = false)
       supabase
         .from("branches")
@@ -150,9 +158,22 @@ export async function getStoreQueueState(branchId: string): Promise<'open' | 'cl
       // Check Global Site Settings from Admin Dashboard
       supabase
         .from("site_settings")
-        .select("is_open, operational_status, accept_new_queue")
+        .select("*")
         .limit(1)
         .maybeSingle(),
+      // Hitung total antrean hari ini
+      supabase
+        .from("queues")
+        .select("id", { count: "exact", head: true })
+        .eq("branch_id", branchId)
+        .eq("queue_date", todayDateStr),
+      // Hitung total antrean yang sedang menunggu
+      supabase
+        .from("queues")
+        .select("id", { count: "exact", head: true })
+        .eq("branch_id", branchId)
+        .eq("queue_date", todayDateStr)
+        .eq("status", "waiting")
     ]);
 
     if (branch && branch.is_active === false) {
@@ -167,7 +188,16 @@ export async function getStoreQueueState(branchId: string): Promise<'open' | 'cl
         settings.operational_status === 'Antrean Penuh' || 
         settings.operational_status === 'Maintenance'
       ) {
+        if (settings.operational_status === 'Antrean Penuh') return 'full';
         return 'closed';
+      }
+
+      // Validasi Limit Antrean (Maksimal Harian & Maksimal Menunggu)
+      if (settings.max_daily_queue && todayTotalCount !== null && todayTotalCount >= settings.max_daily_queue) {
+        return 'full'; // Toko menolak antrean baru dari publik karena limit harian tercapai
+      }
+      if (settings.max_waiting && waitingCount !== null && waitingCount >= settings.max_waiting) {
+        return 'full'; // Toko menolak antrean baru dari publik karena ruang tunggu penuh
       }
     }
 

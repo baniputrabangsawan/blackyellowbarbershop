@@ -6,9 +6,11 @@ import { ArrowRight, CalendarClock } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRealtimeSettings } from "@/hooks/use-settings";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function HeroSection({ settings }: { settings?: any }) {
+export function HeroSection({ settings: initialSettings }: { settings?: any }) {
+  const settings = useRealtimeSettings(initialSettings || {});
   const title = settings?.hero_title || "Potongan Presisi.";
   const subtitle = settings?.hero_subtitle || "Gaya Tanpa Kompromi.";
   const description = settings?.hero_description || "Lebih dari sekadar pangkas rambut. Kami menghadirkan pengalaman premium dengan barber profesional untuk tampilan terbaik Anda.";
@@ -37,12 +39,12 @@ export function HeroSection({ settings }: { settings?: any }) {
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-elevated border border-border mb-6">
             <span className={`w-2 h-2 rounded-full animate-pulse ${
-              settings?.is_open === false || 
-              settings?.operational_status === 'Istirahat' || 
-              settings?.operational_status === 'Antrean Penuh' || 
-              settings?.operational_status === 'Maintenance'
-                ? 'bg-destructive' 
-                : 'bg-success'
+              (() => {
+                const status = (settings?.operational_status || (settings?.is_open === false ? 'Tutup' : 'Buka')).toUpperCase();
+                if (status === 'ANTREAN PENUH' || status === 'TUTUP' || status === 'MAINTENANCE') return 'bg-red-500';
+                if (status === 'ISTIRAHAT') return 'bg-yellow-500';
+                return 'bg-green-500';
+              })()
             }`} />
             <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               {settings?.is_open === false || settings?.operational_status === 'Maintenance' 

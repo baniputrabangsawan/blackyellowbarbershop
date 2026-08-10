@@ -13,17 +13,21 @@ export function RealtimeRefresh() {
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'dummy'
     );
 
+    const channelId = typeof window !== 'undefined' ? Math.random().toString(36).substring(2) : Date.now();
     const channel = supabase
-      .channel(`global-settings-refresh-${Date.now()}`)
+      .channel(`global-app-refresh-${channelId}`)
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'site_settings' },
-        () => {
-          // Refresh the current route to fetch new server component data
+        { event: '*', schema: 'public' },
+        (payload) => {
+          console.log("⚡ [Realtime] Data berubah! Melakukan refresh background...", payload);
+          // Refresh the current route to fetch new server component data (Background refresh)
           router.refresh();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("📡 [Realtime] Status koneksi:", status);
+      });
 
     return () => {
       supabase.removeChannel(channel);
