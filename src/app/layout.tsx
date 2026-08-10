@@ -50,8 +50,8 @@ export async function generateMetadata(): Promise<Metadata> {
       images: settings.og_image_url ? [settings.og_image_url] : [],
     },
     icons: {
-      icon: settings.favicon_url || "/favicon.ico",
-      apple: settings.favicon_url || "/favicon.ico",
+      icon: settings.favicon_url || "/brand/blackyellow.svg?v=4",
+      apple: settings.favicon_url || "/brand/blackyellow.svg?v=4",
     },
     alternates: {
       canonical: "/",

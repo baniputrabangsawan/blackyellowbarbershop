@@ -1,0 +1,90 @@
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   AGENTS.md
+	deleted:    src/actions/admin-barbers.ts
+	deleted:    src/actions/admin-faq.ts
+	deleted:    src/actions/admin-gallery.ts
+	deleted:    src/actions/admin-promo.ts
+	deleted:    src/actions/admin-queue.ts
+	deleted:    src/actions/admin-services.ts
+	deleted:    src/actions/admin-settings.ts
+	deleted:    src/actions/auth-settings.ts
+	deleted:    src/actions/queue.ts
+	deleted:    src/actions/settings.ts
+	deleted:    src/app/admin/(protected)/admin-queue-client.tsx
+	deleted:    src/app/admin/(protected)/audit-log/page.tsx
+	deleted:    src/app/admin/(protected)/barbers/admin-barbers-client.tsx
+	deleted:    src/app/admin/(protected)/barbers/page.tsx
+	deleted:    src/app/admin/(protected)/content/faq/faq-client.tsx
+	deleted:    src/app/admin/(protected)/content/faq/page.tsx
+	deleted:    src/app/admin/(protected)/content/gallery/gallery-client.tsx
+	deleted:    src/app/admin/(protected)/content/gallery/page.tsx
+	deleted:    src/app/admin/(protected)/content/homepage/homepage-form.tsx
+	deleted:    src/app/admin/(protected)/content/homepage/page.tsx
+	deleted:    src/app/admin/(protected)/content/promo/page.tsx
+	deleted:    src/app/admin/(protected)/content/promo/promo-client.tsx
+	deleted:    src/app/admin/(protected)/layout.tsx
+	deleted:    src/app/admin/(protected)/page.tsx
+	deleted:    src/app/admin/(protected)/services/admin-services-client.tsx
+	deleted:    src/app/admin/(protected)/services/page.tsx
+	deleted:    src/app/admin/(protected)/settings/actions.ts
+	deleted:    src/app/admin/(protected)/settings/admin-settings-client.tsx
+	deleted:    src/app/admin/(protected)/settings/page.tsx
+	deleted:    src/app/admin/(protected)/settings/settings-form.tsx
+	deleted:    src/app/admin/login/actions.ts
+	deleted:    src/app/admin/login/login-form.tsx
+	deleted:    src/app/admin/login/page.tsx
+	deleted:    src/app/favicon.ico
+	deleted:    src/app/globals.css
+	deleted:    src/app/layout.tsx
+	deleted:    src/app/page.tsx
+	deleted:    src/app/queue/[id]/page.tsx
+	deleted:    src/app/queue/[id]/queue-ticket-client.tsx
+	deleted:    src/app/queue/page.tsx
+	deleted:    src/app/queue/queue-form.tsx
+	deleted:    src/app/robots.ts
+	deleted:    src/app/sitemap.ts
+	deleted:    src/components/admin/mobile-nav.tsx
+	deleted:    src/components/layout/site-footer.tsx
+	deleted:    src/components/layout/site-header.tsx
+	deleted:    src/components/motion/smooth-scroll-provider.tsx
+	deleted:    src/components/realtime-refresh.tsx
+	deleted:    src/components/sections/barber-section.tsx
+	deleted:    src/components/sections/faq-section.tsx
+	deleted:    src/components/sections/gallery-section.tsx
+	deleted:    src/components/sections/hero-section.tsx
+	deleted:    src/components/sections/location-section.tsx
+	deleted:    src/components/sections/promo-banner.tsx
+	deleted:    src/components/sections/queue-preview-section.tsx
+	deleted:    src/components/sections/services-section.tsx
+	deleted:    src/components/ui/accordion.tsx
+	deleted:    src/components/ui/badge.tsx
+	deleted:    src/components/ui/button.tsx
+	deleted:    src/components/ui/card.tsx
+	deleted:    src/components/ui/checkbox.tsx
+	deleted:    src/components/ui/dialog.tsx
+	deleted:    src/components/ui/input.tsx
+	deleted:    src/components/ui/label.tsx
+	deleted:    src/components/ui/switch.tsx
+	deleted:    src/components/ui/tabs.tsx
+	deleted:    src/hooks/use-settings.ts
+	deleted:    src/lib/auth.ts
+	deleted:    src/lib/supabase/client.ts
+	deleted:    src/lib/supabase/middleware.ts
+	deleted:    src/lib/supabase/server.ts
+	deleted:    src/lib/utils.ts
+	deleted:    src/middleware.ts
+	deleted:    src/types/database.types.ts
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	convert_webp.py
+	crop_logo.py
+	git_status.txt
+	public/brand/
+
+no changes added to commit (use "git add" and/or "git commit -a")
