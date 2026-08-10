@@ -65,7 +65,6 @@ export function SettingsForm({ initialData }: { initialData: SettingsData }) {
           <TabsTrigger value="operational" className="py-2.5 px-4 shrink-0 snap-start">Operasional</TabsTrigger>
           <TabsTrigger value="business" className="py-2.5 px-4 shrink-0 snap-start">Info Bisnis</TabsTrigger>
           <TabsTrigger value="queue" className="py-2.5 px-4 shrink-0 snap-start">Antrean</TabsTrigger>
-          <TabsTrigger value="membership" className="py-2.5 px-4 shrink-0 snap-start">Membership</TabsTrigger>
           <TabsTrigger value="branding" className="py-2.5 px-4 shrink-0 snap-start">Branding</TabsTrigger>
         </TabsList>
 
@@ -255,50 +254,6 @@ export function SettingsForm({ initialData }: { initialData: SettingsData }) {
                     <Label htmlFor="allow_barber_selection">Izinkan Pemilihan Barber</Label>
                     <p className="text-xs text-muted-foreground">Pelanggan bisa memilih barber spesifik saat mengambil nomor antrean.</p>
                   </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="membership" className="space-y-6">
-          <Card className="bg-surface border-border">
-            <CardHeader>
-              <CardTitle>Aturan Membership</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center justify-between p-4 border border-border rounded-lg bg-background/50">
-                <div className="space-y-0.5">
-                  <Label className="text-base font-semibold">Pendaftaran Publik Aktif</Label>
-                  <p className="text-sm text-muted-foreground">Izinkan pelanggan mendaftar membership baru melalui website.</p>
-                </div>
-                <Switch 
-                  checked={!!formData.membership_registration_active} 
-                  onCheckedChange={(v) => handleChange("membership_registration_active", v)} 
-                />
-              </div>
-
-              <div className="flex items-start space-x-3 p-4 border border-border rounded-lg bg-background/50">
-                <Checkbox 
-                  id="auto_activate_membership" 
-                  checked={!!formData.auto_activate_membership}
-                  onCheckedChange={(v) => handleChange("auto_activate_membership", v)}
-                />
-                <div className="space-y-1 leading-none">
-                  <Label htmlFor="auto_activate_membership">Aktivasi Otomatis</Label>
-                  <p className="text-xs text-muted-foreground">Jika dimatikan, admin harus memverifikasi pendaftaran secara manual.</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start space-x-3 p-4 border border-border rounded-lg bg-background/50">
-                <Checkbox 
-                  id="birthday_promo_active" 
-                  checked={!!formData.birthday_promo_active}
-                  onCheckedChange={(v) => handleChange("birthday_promo_active", v)}
-                />
-                <div className="space-y-1 leading-none">
-                  <Label htmlFor="birthday_promo_active">Promo Ulang Tahun Aktif</Label>
-                  <p className="text-xs text-muted-foreground">Berikan notifikasi khusus atau diskon otomatis di hari ulang tahun member.</p>
                 </div>
               </div>
             </CardContent>

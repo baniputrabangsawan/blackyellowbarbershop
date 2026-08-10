@@ -16,7 +16,6 @@ const navLinks = [
   { name: "Live Queue", href: "/#queue" },
   { name: "Barber", href: "/#barber" },
   { name: "Gallery", href: "/#gallery" },
-  { name: "Membership", href: "/membership" },
   { name: "Lokasi", href: "/#location" },
 ];
 

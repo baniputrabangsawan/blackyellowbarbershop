@@ -8,7 +8,15 @@ export const metadata = {
   description: "Daftar antrean online di Black Yellow Barbershop Makassar. Hemat waktu, pantau giliran secara realtime dari ponsel Anda.",
 };
 
-export default async function QueuePage() {
+export default async function QueuePage({ 
+  searchParams 
+}: { 
+  searchParams?: { [key: string]: string | string[] | undefined } 
+}) {
+  // Dalam Next.js versi terbaru, mungkin berupa promise, kita tangani secara dinamis
+  const sp = await searchParams;
+  const initialServiceId = typeof sp?.service === 'string' ? sp.service : undefined;
+
   const options = await getQueueOptions();
   let storeState = 'offline';
   
@@ -48,7 +56,7 @@ export default async function QueuePage() {
               </p>
             </div>
           ) : (
-            <QueueForm options={options} />
+            <QueueForm options={options} initialServiceId={initialServiceId} />
           )}
         </div>
       </main>

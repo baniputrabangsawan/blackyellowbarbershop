@@ -76,10 +76,6 @@ export default async function AdminLayout({ children }: { children: ReactNode })
                 <Users size={20} />
                 Barber
               </Link>
-              <Link href="/admin/memberships" className="flex items-center gap-3 px-4 py-2.5 rounded-md text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors">
-                <ShieldCheck size={20} />
-                Membership
-              </Link>
             </div>
           </div>
 

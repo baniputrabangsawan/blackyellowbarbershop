@@ -31,7 +31,7 @@ export default async function Home() {
       <main className="flex w-full flex-1 flex-col">
         <HeroSection settings={settings} />
         <ServicesSection />
-        <QueuePreviewSection />
+        <QueuePreviewSection settings={settings} />
         <BarberSection />
         <GallerySection galleries={galleries} />
         <LocationSection settings={settings} />

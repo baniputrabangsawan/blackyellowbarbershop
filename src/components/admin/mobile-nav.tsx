@@ -23,7 +23,6 @@ const adminGroups = [
     links: [
       { name: "Layanan", href: "/admin/services", icon: Scissors },
       { name: "Barber", href: "/admin/barbers", icon: Users },
-      { name: "Membership", href: "/admin/memberships", icon: ShieldCheck },
     ]
   },
   {

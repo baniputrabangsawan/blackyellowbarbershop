@@ -7,17 +7,14 @@ import { isStoreOpenAtCurrentTime } from "@/lib/utils";
 export function useRealtimeSettings<T>(initialSettings: T) {
   const [settings, setSettings] = useState(initialSettings);
   const [prevInitialSettings, setPrevInitialSettings] = useState(initialSettings);
-  const [isTimeOpen, setIsTimeOpen] = useState(true);
+  const [isTimeOpen, setIsTimeOpen] = useState(isStoreOpenAtCurrentTime);
 
-  if (initialSettings !== prevInitialSettings) {
+  if (JSON.stringify(initialSettings) !== JSON.stringify(prevInitialSettings)) {
     setPrevInitialSettings(initialSettings);
     setSettings(initialSettings);
   }
 
   useEffect(() => {
-    // Initial check
-    setIsTimeOpen(isStoreOpenAtCurrentTime());
-    
     // Check every minute
     const interval = setInterval(() => {
       setIsTimeOpen(isStoreOpenAtCurrentTime());
@@ -52,7 +49,7 @@ export function useRealtimeSettings<T>(initialSettings: T) {
   }, []);
 
   // Override settings if store should be closed by time
-  const augmentedSettings = { ...settings } as any;
+  const augmentedSettings = { ...settings } as T & { is_open?: boolean; operational_status?: string };
   if (augmentedSettings && typeof augmentedSettings.is_open !== 'undefined') {
     if (!isTimeOpen) {
       augmentedSettings.is_open = false;

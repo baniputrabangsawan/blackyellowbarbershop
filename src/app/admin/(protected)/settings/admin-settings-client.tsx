@@ -129,6 +129,35 @@ export function AdminSettingsClient({ initialSettings }: { initialSettings: any 
             </div>
           </CardContent>
         </Card>
+
+        {/* Tambah Cabang Gowa */}
+        <Card className="bg-surface border-border overflow-hidden">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-primary">
+              <Store className="w-5 h-5" />
+              Kelola Cabang
+            </CardTitle>
+            <CardDescription>Tambahkan cabang baru ke sistem</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="p-4 border border-border rounded-xl bg-background space-y-4">
+              <p className="text-sm text-foreground">
+                Tambahkan cabang "Black Yellow Gowa" ke dalam database antrean.
+              </p>
+              <Button 
+                variant="outline" 
+                onClick={async () => {
+                  const { addGowaBranch } = await import("@/actions/admin-settings");
+                  const res = await addGowaBranch();
+                  alert(res.message || res.error);
+                }} 
+                className="w-full border-primary text-primary hover:bg-primary/10"
+              >
+                + Tambah Cabang Gowa
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="space-y-6">

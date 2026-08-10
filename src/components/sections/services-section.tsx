@@ -115,7 +115,7 @@ const ServiceCard = ({
         </div>
 
         <Link
-          href="/queue"
+          href={`/queue?service=${service.id}`}
           className={buttonVariants({
             variant: service.popular ? "default" : "outline",
             size: "lg",

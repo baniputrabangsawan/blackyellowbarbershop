@@ -9,10 +9,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getLiveQueueStatus, getStoreQueueState } from "@/actions/queue";
 import { createBrowserClient } from "@supabase/ssr";
+import { useRealtimeSettings } from "@/hooks/use-settings";
 
-export function QueuePreviewSection() {
+export function QueuePreviewSection({ settings: initialSettings }: { settings?: any }) {
   const [isLoading, setIsLoading] = useState(true);
   const [status, setStatus] = useState({ currentNumber: null as number | null, waitingCount: 0, estimatedWaitMins: 0, storeState: 'offline' });
+  const settings = useRealtimeSettings(initialSettings || {});
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost',
@@ -177,7 +179,7 @@ export function QueuePreviewSection() {
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
                           <span className="relative inline-flex rounded-full h-3 w-3 bg-success"></span>
                         </>
-                      ) : status.storeState === 'full' ? (
+                      ) : (status.storeState === 'full' || settings?.operational_status === 'Istirahat') ? (
                         <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
                       ) : (
                         <span className="relative inline-flex rounded-full h-3 w-3 bg-destructive"></span>
@@ -186,9 +188,18 @@ export function QueuePreviewSection() {
                     <span className={`text-sm font-bold uppercase tracking-wider ${
                       isLoading ? 'text-muted-foreground' : 
                       status.storeState === 'open' ? 'text-success' : 
-                      status.storeState === 'full' ? 'text-yellow-500' : 'text-destructive'
+                      (status.storeState === 'full' || settings?.operational_status === 'Istirahat') ? 'text-yellow-500' : 'text-destructive'
                     }`}>
-                      {isLoading ? 'Menghubungkan...' : status.storeState === 'open' ? 'Live Update' : status.storeState === 'full' ? 'Antrean Penuh' : 'Toko Tutup'}
+                      {isLoading 
+                        ? 'Menghubungkan...' 
+                        : status.storeState === 'open' 
+                          ? 'Live Update' 
+                          : status.storeState === 'full' 
+                            ? 'Antrean Penuh' 
+                            : (settings?.operational_status && settings?.operational_status.toLowerCase() !== 'buka')
+                              ? settings.operational_status.toUpperCase()
+                              : 'TOKO TUTUP'
+                      }
                     </span>
                   </div>
                   <span className="text-xs text-muted-foreground">Otomatis Diperbarui</span>

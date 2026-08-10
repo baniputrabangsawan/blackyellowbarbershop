@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronDown, Check } from "lucide-react";
 
 const queueFormSchema = z.object({
   customerName: z.string().min(2, "Nama minimal 2 karakter"),
@@ -20,25 +20,29 @@ const queueFormSchema = z.object({
 
 type QueueFormValues = z.infer<typeof queueFormSchema>;
 
-export function QueueForm({ options }: { options: any }) {
+export function QueueForm({ options, initialServiceId }: { options: any, initialServiceId?: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<QueueFormValues>({
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<QueueFormValues>({
     resolver: zodResolver(queueFormSchema),
     defaultValues: {
       branchId: options.branches[0]?.id || "",
-      serviceId: ""
+      serviceId: initialServiceId || ""
     }
   });
+
+  const selectedServiceId = watch("serviceId");
+  const selectedService = options.services.find((s: any) => s.id === selectedServiceId);
 
   const onSubmit = async (data: QueueFormValues) => {
     setIsSubmitting(true);
     
     // Cari detail layanan untuk harga
-    const selectedService = options.services.find((s: any) => s.id === data.serviceId);
-    const serviceName = selectedService?.name || "Layanan Tidak Diketahui";
-    const servicePrice = selectedService?.price 
-      ? `(Rp ${selectedService.price.toLocaleString("id-ID")})` 
+    const selectedServiceData = options.services.find((s: any) => s.id === data.serviceId);
+    const serviceName = selectedServiceData?.name || "Layanan Tidak Diketahui";
+    const servicePrice = selectedServiceData?.price 
+      ? `(Rp ${selectedServiceData.price.toLocaleString("id-ID")})` 
       : "";
 
     // Template Pesan WA
@@ -63,15 +67,15 @@ Mohon info cara pembayarannya. Terima kasih.`;
   };
 
   return (
-    <Card className="bg-surface border-border overflow-hidden">
-      <CardContent className="p-8">
+    <div className="bg-surface border border-border rounded-xl shadow-2xl overflow-visible" style={{ overflow: "visible" }}>
+      <div className="p-6 md:p-8">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="branchId" className="text-foreground">Cabang</Label>
+            <Label htmlFor="branchId" className="text-foreground font-medium">Cabang</Label>
             <select
               id="branchId"
               {...register("branchId")}
-              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex w-full items-center justify-between rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
             >
               {options.branches.map((b: any) => (
                 <option key={b.id} value={b.id}>{b.name}</option>
@@ -82,52 +86,100 @@ Mohon info cara pembayarannya. Terima kasih.`;
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="customerName" className="text-foreground">Nama Lengkap</Label>
+              <Label htmlFor="customerName" className="text-foreground font-medium">Nama Lengkap</Label>
               <Input
                 id="customerName"
                 placeholder="Misal: Budi"
                 {...register("customerName")}
-                className="bg-background border-input"
+                className="bg-background"
               />
               {errors.customerName && <p className="text-sm text-destructive">{errors.customerName.message}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone" className="text-foreground">Nomor WhatsApp</Label>
+              <Label htmlFor="phone" className="text-foreground font-medium">Nomor WhatsApp</Label>
               <Input
                 id="phone"
                 type="tel"
                 placeholder="Misal: 081234567890"
                 {...register("phone")}
-                className="bg-background border-input"
+                className="bg-background"
               />
               {errors.phone && <p className="text-sm text-destructive">{errors.phone.message}</p>}
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="serviceId" className="text-foreground">Pilih Layanan</Label>
-            <select
-              id="serviceId"
-              {...register("serviceId")}
-              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value="" disabled>-- Pilih Layanan --</option>
-              {options.services.map((s: any) => (
-                <option key={s.id} value={s.id}>{s.name} - Rp {s.price?.toLocaleString("id-ID")}</option>
-              ))}
-            </select>
+          <div className="space-y-2 relative">
+            <Label className="text-foreground font-medium">Pilih Layanan</Label>
+            
+            {/* Minimalist Select Dropdown */}
+            <div className="relative">
+              <button 
+                type="button" 
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className={`flex w-full items-center justify-between rounded-md border ${errors.serviceId ? 'border-destructive' : 'border-input'} bg-background px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors`}
+              >
+                {selectedService ? (
+                  <div className="flex flex-col items-start text-left">
+                    <span className="font-medium text-foreground">{selectedService.name}</span>
+                    <span className="text-xs text-muted-foreground mt-0.5">
+                      Rp {selectedService.price?.toLocaleString("id-ID")} • {selectedService.duration_minutes} Menit
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-muted-foreground">-- Pilih Layanan --</span>
+                )}
+                <ChevronDown className="h-4 w-4 text-muted-foreground opacity-50" />
+              </button>
+              
+              {isDropdownOpen && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setIsDropdownOpen(false)} 
+                  />
+                  <div className="relative z-50 mt-2 w-full overflow-y-visible rounded-md border border-border bg-popover text-popover-foreground shadow-sm animate-in slide-in-from-top-2 duration-150">
+                    <div className="p-1">
+                      {options.services.map((s: any) => (
+                        <button
+                          key={s.id}
+                          type="button"
+                          onClick={() => {
+                            setValue("serviceId", s.id, { shouldValidate: true });
+                            setIsDropdownOpen(false);
+                          }}
+                          className={`relative flex w-full cursor-pointer select-none items-center justify-between rounded-sm py-2 px-3 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground ${selectedServiceId === s.id ? "bg-accent/50" : ""}`}
+                        >
+                          <div className="flex flex-col items-start text-left">
+                            <span className={`font-medium ${selectedServiceId === s.id ? "text-primary" : ""}`}>
+                              {s.name}
+                            </span>
+                            <span className="text-xs text-muted-foreground mt-0.5">
+                              Rp {s.price?.toLocaleString("id-ID")} • {s.duration_minutes} Menit
+                            </span>
+                          </div>
+                          {selectedServiceId === s.id && (
+                            <Check className="h-4 w-4 text-primary ml-3 flex-shrink-0" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+            
             {errors.serviceId && <p className="text-sm text-destructive">{errors.serviceId.message}</p>}
           </div>
 
           <Button 
             type="submit" 
             disabled={isSubmitting} 
-            className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary-hover font-semibold py-6 text-base mt-4"
+            className="w-full rounded-md font-medium"
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Mengalihkan ke WhatsApp...
               </>
             ) : (
@@ -135,7 +187,7 @@ Mohon info cara pembayarannya. Terima kasih.`;
             )}
           </Button>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

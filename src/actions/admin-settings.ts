@@ -54,6 +54,41 @@ export async function updateBranchStatus(branchId: string, isActive: boolean) {
   return { success: true };
 }
 
+export async function addGowaBranch() {
+  const { isAuthorized } = await verifyAdmin();
+  if (!isAuthorized) return { success: false, error: "Unauthorized" };
+  const supabase = await createClient();
+  
+  // Cek apakah Gowa sudah ada
+  const { data: existing } = await supabase
+    .from("branches")
+    .select("id")
+    .ilike("name", "%Gowa%")
+    .maybeSingle();
+    
+  if (existing) {
+    return { success: true, message: "Cabang Gowa sudah ada." };
+  }
+
+  const { error } = await supabase
+    .from("branches")
+    .insert({
+      name: "Black Yellow Gowa",
+      address: "Kabupaten Gowa, Sulawesi Selatan",
+      phone: "081234567891",
+      is_active: true
+    });
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/");
+  revalidatePath("/queue");
+  revalidatePath("/admin/settings");
+  return { success: true, message: "Cabang Gowa berhasil ditambahkan!" };
+}
+
 const heroSchema = z.object({
   title: z.string().min(1, "Title wajib diisi").max(100, "Title maksimal 100 karakter"),
   subtitle: z.string().min(1, "Subtitle wajib diisi").max(150, "Subtitle maksimal 150 karakter"),

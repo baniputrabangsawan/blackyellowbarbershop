@@ -40,21 +40,30 @@ export function HeroSection({ settings: initialSettings }: { settings?: any }) {
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-elevated border border-border mb-6">
             <span className={`w-2 h-2 rounded-full animate-pulse ${
               (() => {
-                const status = (settings?.operational_status || (settings?.is_open === false ? 'Tutup' : 'Buka')).toUpperCase();
-                if (status === 'ANTREAN PENUH' || status === 'TUTUP' || status === 'MAINTENANCE') return 'bg-red-500';
+                const statusText = settings?.is_open === false ? (settings?.operational_status || 'Tutup') : (settings?.operational_status || 'Buka');
+                const status = statusText.toUpperCase();
+                if (status === 'ANTREAN PENUH' || status === 'TUTUP' || status === 'MAINTENANCE' || status.includes('TUTUP')) return 'bg-red-500';
                 if (status === 'ISTIRAHAT') return 'bg-yellow-500';
                 return 'bg-green-500';
               })()
             }`} />
             <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              {settings?.is_open === false || settings?.operational_status === 'Maintenance' 
-                ? 'Toko Tutup' 
-                : settings?.operational_status === 'Istirahat'
-                ? 'Sedang Istirahat'
-                : settings?.operational_status === 'Antrean Penuh'
-                ? 'Antrean Penuh'
-                : `Buka Hari Ini ${new Date().getDay() === 0 || new Date().getDay() === 6 ? '09:00 - 22:00' : '10:00 - 21:00'}`
-              }
+              {(() => {
+                if (settings?.is_open === false) {
+                  if (settings?.operational_status && settings.operational_status.toLowerCase().includes('luar jam')) return 'TUTUP (LUAR JAM)';
+                  if (settings?.operational_status && settings.operational_status.toLowerCase() !== 'buka') return settings.operational_status.toUpperCase();
+                  return 'TOKO TUTUP';
+                }
+                
+                if (settings?.operational_status && settings.operational_status.toLowerCase() !== 'buka') {
+                  return settings.operational_status.toUpperCase();
+                }
+
+                const day = new Date().getDay();
+                let hours = '10:00 - 22:00';
+                if (day === 5) hours = '13:00 - 22:00'; // Jumat
+                return `BUKA HARI INI ${hours}`;
+              })()}
             </span>
           </div>
 

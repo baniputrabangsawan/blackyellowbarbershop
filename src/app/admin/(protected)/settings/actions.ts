@@ -52,12 +52,6 @@ export async function updateSiteSettingsAction(data: any) {
         late_tolerance_mins: data.late_tolerance_mins,
         allow_barber_selection: data.allow_barber_selection,
         
-        // Membership
-        membership_registration_active: data.membership_registration_active,
-        auto_activate_membership: data.auto_activate_membership,
-        default_membership_days: data.default_membership_days,
-        birthday_promo_active: data.birthday_promo_active,
-        
         // Branding & SEO
         logo_url: data.logo_url,
         favicon_url: data.favicon_url,
@@ -104,12 +98,6 @@ export async function updateSiteSettingsAction(data: any) {
         default_estimation_mins: data.default_estimation_mins ?? 45,
         late_tolerance_mins: data.late_tolerance_mins ?? 15,
         allow_barber_selection: data.allow_barber_selection ?? true,
-        
-        // Membership
-        membership_registration_active: data.membership_registration_active ?? true,
-        auto_activate_membership: data.auto_activate_membership ?? false,
-        default_membership_days: data.default_membership_days ?? 365,
-        birthday_promo_active: data.birthday_promo_active ?? false,
         
         // Branding & SEO
         logo_url: data.logo_url,
