@@ -6,7 +6,9 @@ DELETE FROM public.membership_plans;
 
 -- 1. Insert Branches
 INSERT INTO public.branches (id, name, address, whatsapp, is_active)
-VALUES ('00000000-0000-0000-0000-000000000001', 'Black Yellow Makassar', 'Jl. Contoh No. 123, Makassar', '081234567890', true);
+VALUES
+  ('00000000-0000-0000-0000-000000000001', 'Black Yellow Makassar', 'Alamat Cabang Makassar', '0811424428', true),
+  ('00000000-0000-0000-0000-000000000002', 'Black Yellow Gowa', 'Alamat Cabang Gowa', '0811424427', true);
 
 -- 2. Insert Services
 INSERT INTO public.services (name, category, price, duration_minutes, is_active)

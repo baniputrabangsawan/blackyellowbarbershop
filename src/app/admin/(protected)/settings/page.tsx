@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { SettingsForm } from "./settings-form";
+import { verifyAdmin } from "@/lib/auth";
+import { getAdminAccounts } from "@/actions/auth-settings";
 
 export const metadata = {
   title: "Pengaturan Sistem - Black Yellow Admin",
@@ -7,6 +9,12 @@ export const metadata = {
 
 export default async function SettingsPage() {
   const supabase = await createClient();
+  const { role } = await verifyAdmin();
+  
+  let adminAccounts = [];
+  if (role === "owner") {
+    adminAccounts = await getAdminAccounts();
+  }
 
   // Ambil data konfigurasi
   const { data: settings, error } = await supabase
@@ -26,7 +34,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <SettingsForm initialData={settings} />
+      <SettingsForm initialData={settings} userRole={role} adminAccounts={adminAccounts} />
     </div>
   );
 }

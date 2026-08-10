@@ -7,6 +7,7 @@ import { ArrowRight, Check, Clock } from "lucide-react";
 import Link from "next/link";
 
 type ServiceItem = {
+  slug: string;
   name: string;
   desc?: string;
   price: string;
@@ -24,11 +25,11 @@ const coreCutBenefits = [
 
 const servicesData: Record<string, ServiceItem[]> = {
   package: [
-    { name: "Junior Cuts", price: "Rp35.000", features: [...coreCutBenefits] },
-    { name: "Bronze Cuts", price: "Rp40.000", features: [...coreCutBenefits] },
-    { name: "Silver Cuts", price: "Rp45.000", features: [...coreCutBenefits, "Handuk Hangat"] },
-    { name: "Gold Cuts", price: "Rp50.000", features: [...coreCutBenefits, "Handuk Hangat", "Pijat Ringan"] },
-    { name: "Premium Cuts", price: "Rp60.000", features: [...coreCutBenefits, "Handuk Hangat", "Pijat Ringan", "Vacuum Komedo"], popular: true },
+    { slug: "junior-cuts", name: "Junior Cuts", price: "Rp35.000", features: [...coreCutBenefits] },
+    { slug: "bronze-cuts", name: "Bronze Cuts", price: "Rp40.000", features: [...coreCutBenefits] },
+    { slug: "silver-cuts", name: "Silver Cuts", price: "Rp45.000", features: [...coreCutBenefits, "Handuk Hangat"] },
+    { slug: "gold-cuts", name: "Gold Cuts", price: "Rp50.000", features: [...coreCutBenefits, "Handuk Hangat", "Pijat Ringan"] },
+    { slug: "premium-cuts", name: "Premium Cuts", price: "Rp60.000", features: [...coreCutBenefits, "Handuk Hangat", "Pijat Ringan", "Vacuum Komedo"], popular: true },
   ]
 };
 
@@ -115,7 +116,7 @@ const ServiceCard = ({
         </div>
 
         <Link
-          href={`/queue?service=${service.id}`}
+          href={`/queue?service=${service.slug}`}
           className={buttonVariants({
             variant: service.popular ? "default" : "outline",
             size: "lg",

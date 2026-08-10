@@ -7,38 +7,8 @@ import { Scissors, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
-const barbers = [
-  {
-    name: "Ahmad",
-    specialties: ["Classic Cut", "Fading", "Hair Color"],
-    experience: "5 Tahun",
-    image: "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?q=80&w=2070&auto=format&fit=crop",
-    available: true
-  },
-  {
-    name: "Rizky",
-    specialties: ["Modern Textures", "Beard Grooming"],
-    experience: "3 Tahun",
-    image: "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=1976&auto=format&fit=crop",
-    available: true
-  },
-  {
-    name: "Budi",
-    specialties: ["Kid's Cut", "Hair Tattoo"],
-    experience: "4 Tahun",
-    image: "https://images.unsplash.com/photo-1605497788044-5a32c7078486?q=80&w=1974&auto=format&fit=crop",
-    available: false
-  },
-  {
-    name: "Toni",
-    specialties: ["Classic Cut", "Hot Towel Shave"],
-    experience: "7 Tahun",
-    image: "https://images.unsplash.com/photo-1593702275687-f8b402bf1fb5?q=80&w=2000&auto=format&fit=crop",
-    available: true
-  }
-];
-
-export function BarberSection() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function BarberSection({ barbers = [] }: { barbers?: any[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(1); // Default for mobile (SSR safe)
 
@@ -61,7 +31,7 @@ export function BarberSection() {
       clearTimeout(timeoutId);
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [barbers.length]);
 
   const maxIndex = Math.max(0, barbers.length - itemsPerPage);
 
@@ -74,6 +44,10 @@ export function BarberSection() {
   };
 
   const showButtons = barbers.length > itemsPerPage;
+
+  if (!barbers || barbers.length === 0) {
+    return null; // Tidak tampil jika belum ada barber
+  }
 
   return (
     <section id="barber" className="py-24 bg-background overflow-hidden">
@@ -95,55 +69,61 @@ export function BarberSection() {
             className="flex transition-transform duration-500 ease-in-out"
             style={{ transform: `translateX(calc(-${currentIndex} * (100% / ${itemsPerPage})))` }}
           >
-            {barbers.map((barber, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="w-full md:w-1/3 shrink-0 px-4"
-              >
-                <Card className="bg-surface border-border overflow-hidden group h-full shadow-lg hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 hover:border-primary/50 transition-all duration-300">
-                  <div className="relative aspect-[4/5] overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
-                    <Image
-                      src={barber.image}
-                      alt={barber.name}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute bottom-6 left-6 right-6 z-20">
-                      <div className="flex justify-between items-end">
-                        <div>
-                          <h3 className="font-heading text-2xl font-bold text-white mb-1">{barber.name}</h3>
-                          <p className="text-white/70 text-sm">{barber.experience} Pengalaman</p>
+            {barbers.map((barber, index) => {
+              // Fallback gambar jika tidak ada foto
+              const imageUrl = barber.photo_url || "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?q=80&w=2070&auto=format&fit=crop";
+              const specs = barber.specialties || ["Haircut", "Grooming"];
+              
+              return (
+                <motion.div
+                  key={barber.id || index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                  className="w-full md:w-1/3 shrink-0 px-4"
+                >
+                  <Card className="bg-surface border-border overflow-hidden group h-full shadow-lg hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 hover:border-primary/50 transition-all duration-300">
+                    <div className="relative aspect-[4/5] overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
+                      <Image
+                        src={imageUrl}
+                        alt={barber.name}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                      />
+                      <div className="absolute bottom-6 left-6 right-6 z-20">
+                        <div className="flex justify-between items-end">
+                          <div>
+                            <h3 className="font-heading text-2xl font-bold text-white mb-1">{barber.name}</h3>
+                            {barber.bio && <p className="text-white/70 text-sm line-clamp-1">{barber.bio}</p>}
+                          </div>
+                          {barber.is_active ? (
+                            <Badge className="bg-success/20 text-success border-success/30">Tersedia</Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-muted-foreground border-border bg-background/50 backdrop-blur-sm">Off</Badge>
+                          )}
                         </div>
-                        {barber.available ? (
-                          <Badge className="bg-success/20 text-success border-success/30">Tersedia</Badge>
-                        ) : (
-                          <Badge variant="outline" className="text-muted-foreground border-border bg-background/50 backdrop-blur-sm">Off</Badge>
-                        )}
                       </div>
                     </div>
-                  </div>
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-2 mb-3 text-sm font-medium text-foreground uppercase tracking-wider">
-                      <Scissors size={14} className="text-primary" />
-                      <span>Spesialisasi</span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {barber.specialties.map((spec, i) => (
-                        <span key={i} className="text-xs text-muted-foreground bg-background px-3 py-1 rounded-full border border-border shadow-sm">
-                          {spec}
-                        </span>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-2 mb-3 text-sm font-medium text-foreground uppercase tracking-wider">
+                        <Scissors size={14} className="text-primary" />
+                        <span>Spesialisasi</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {specs.map((spec: string, i: number) => (
+                          <span key={i} className="text-xs text-muted-foreground bg-background px-3 py-1 rounded-full border border-border shadow-sm">
+                            {spec}
+                          </span>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
 

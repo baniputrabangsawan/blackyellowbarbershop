@@ -1,10 +1,12 @@
 import { getTodayQueues } from "@/actions/admin-queue";
 import { getQueueOptions } from "@/actions/queue";
 import { AdminQueueClient } from "./admin-queue-client";
+import { verifyAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
+  const { branchId } = await verifyAdmin();
   const queues = await getTodayQueues();
   const options = await getQueueOptions();
 
@@ -17,7 +19,7 @@ export default async function AdminPage() {
         </div>
       </div>
 
-      <AdminQueueClient initialQueues={queues} options={options} />
+      <AdminQueueClient initialQueues={queues} options={options} userBranchId={branchId} />
     </div>
   );
 }

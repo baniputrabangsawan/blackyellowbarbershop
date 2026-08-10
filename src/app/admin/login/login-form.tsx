@@ -61,14 +61,13 @@ export function LoginForm() {
           )}
           
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-foreground">Email</Label>
+            <Label htmlFor="username" className="text-foreground">Username</Label>
             <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="admin@blackyellow.com"
+              id="username"
+              name="username"
+              type="text"
               required
-              autoComplete="email"
+              autoComplete="username"
               className="bg-background/60 border-border/50 text-foreground focus-visible:ring-primary focus-visible:border-primary h-11 transition-all"
             />
           </div>

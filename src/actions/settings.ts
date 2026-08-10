@@ -57,3 +57,13 @@ export async function getPublicPromos() {
     return isStarted && isNotExpired;
   });
 }
+
+export async function getPublicBarbers() {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("barbers")
+    .select("*")
+    .eq("is_active", true)
+    .order("name", { ascending: true });
+  return data || [];
+}

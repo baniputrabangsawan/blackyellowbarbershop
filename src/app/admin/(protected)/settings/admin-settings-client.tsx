@@ -142,7 +142,7 @@ export function AdminSettingsClient({ initialSettings }: { initialSettings: any 
           <CardContent>
             <div className="p-4 border border-border rounded-xl bg-background space-y-4">
               <p className="text-sm text-foreground">
-                Tambahkan cabang "Black Yellow Gowa" ke dalam database antrean.
+                Tambahkan cabang &quot;Black Yellow Gowa&quot; ke dalam database antrean.
               </p>
               <Button 
                 variant="outline" 

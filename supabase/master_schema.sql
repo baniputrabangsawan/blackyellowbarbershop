@@ -17,6 +17,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TABLE IF NOT EXISTS public.admin_users (
   user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   role TEXT NOT NULL DEFAULT 'staff',
+  branch_id UUID REFERENCES public.branches(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -268,5 +269,44 @@ $$;
 -- ALTER PUBLICATION supabase_realtime ADD TABLE site_settings;
 -- ALTER PUBLICATION supabase_realtime ADD TABLE queues;
 
--- 7. REFRESH SCHEMA CACHE
+-- 7. SEED DATA (DATA AWAL)
+-- Pastikan cabang Makassar ada dan aktif
+INSERT INTO public.branches (name, address, whatsapp, is_active)
+SELECT 'Black Yellow Makassar', 'Jl. AP. Pettarani No. 123, Makassar, Sulawesi Selatan, Indonesia', '0811424428', true
+WHERE NOT EXISTS (
+  SELECT 1 FROM public.branches WHERE name = 'Black Yellow Makassar'
+);
+
+UPDATE public.branches 
+SET is_active = true, whatsapp = '0811424428' 
+WHERE name = 'Black Yellow Makassar';
+
+-- Pastikan cabang Gowa ada dan aktif
+INSERT INTO public.branches (name, address, whatsapp, is_active)
+SELECT 'Black Yellow Gowa', 'Jl. Andi Tonro No.64D, Bonto-Bontoa Kec. Somba Opu, Kabupaten Gowa Sulawesi Selatan 92113, Indonesia', '0811424427', true
+WHERE NOT EXISTS (
+  SELECT 1 FROM public.branches WHERE name = 'Black Yellow Gowa'
+);
+
+UPDATE public.branches 
+SET is_active = true, whatsapp = '0811424427' 
+WHERE name = 'Black Yellow Gowa';
+
+-- 8. CLEANUP SCRIPT (JIKA ADA DUPLIKAT SAAT TESTING)
+-- Hapus semua antrean percobaan yang menyangkut di cabang duplikat
+DELETE FROM public.queues;
+
+-- Hapus semua cabang duplikat, dan hanya menyisakan 1 yang paling pertama dibuat
+DELETE FROM public.branches
+WHERE id NOT IN (
+    SELECT id
+    FROM (
+        SELECT id,
+               ROW_NUMBER() OVER (PARTITION BY name ORDER BY created_at ASC) as rnum
+        FROM public.branches
+    ) t
+    WHERE t.rnum = 1
+);
+
+-- 9. REFRESH SCHEMA CACHE
 NOTIFY pgrst, 'reload schema';

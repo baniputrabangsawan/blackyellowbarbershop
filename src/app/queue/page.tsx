@@ -15,7 +15,7 @@ export default async function QueuePage({
 }) {
   // Dalam Next.js versi terbaru, mungkin berupa promise, kita tangani secara dinamis
   const sp = await searchParams;
-  const initialServiceId = typeof sp?.service === 'string' ? sp.service : undefined;
+  const initialServiceSlug = typeof sp?.service === 'string' ? sp.service : undefined;
 
   const options = await getQueueOptions();
   let storeState = 'offline';
@@ -56,7 +56,7 @@ export default async function QueuePage({
               </p>
             </div>
           ) : (
-            <QueueForm options={options} initialServiceId={initialServiceId} />
+            <QueueForm options={options} initialServiceSlug={initialServiceSlug} />
           )}
         </div>
       </main>

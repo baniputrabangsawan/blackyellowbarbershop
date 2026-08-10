@@ -5,18 +5,23 @@ export async function verifyAdmin() {
   const { data: { user }, error } = await supabase.auth.getUser();
 
   if (error || !user) {
-    return { isAuthorized: false, user: null };
+    return { isAuthorized: false, user: null, role: null, branchId: null };
   }
 
   const { data: adminUser, error: adminError } = await supabase
     .from("admin_users")
-    .select("role")
+    .select("role, branch_id")
     .eq("user_id", user.id)
     .single();
 
   if (adminError || !adminUser) {
-    return { isAuthorized: false, user };
+    return { isAuthorized: false, user, role: null, branchId: null };
   }
 
-  return { isAuthorized: true, user, role: adminUser.role };
+  return { 
+    isAuthorized: true, 
+    user, 
+    role: adminUser.role, 
+    branchId: adminUser.branch_id 
+  };
 }

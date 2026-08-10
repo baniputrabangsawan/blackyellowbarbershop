@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,15 +9,56 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Save, Loader2 } from "lucide-react";
+import { Save, Loader2, KeyRound } from "lucide-react";
 import { updateSiteSettingsAction } from "./actions";
+import { updateAdminCredentials } from "@/actions/auth-settings";
 
 type SettingsData = Record<string, any>;
 
-export function SettingsForm({ initialData }: { initialData: SettingsData }) {
+export function SettingsForm({ initialData, userRole, adminAccounts = [] }: { initialData: SettingsData, userRole?: string | null, adminAccounts?: any[] }) {
   const [formData, setFormData] = useState<SettingsData>(initialData || {});
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
+
+  // State untuk ganti kredensial admin
+  const [targetAdmin, setTargetAdmin] = useState(adminAccounts[0]?.user_id || "");
+  const [newUsername, setNewUsername] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [isResetting, setIsResetting] = useState(false);
+
+  // Effect to update input when selection changes
+  useEffect(() => {
+    const selectedAdmin = adminAccounts.find(a => a.user_id === targetAdmin);
+    if (selectedAdmin) {
+      setNewUsername(selectedAdmin.username);
+    }
+  }, [targetAdmin, adminAccounts]);
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newUsername && !newPassword) {
+      setMessage({ type: 'error', text: 'Tidak ada perubahan yang dilakukan.' });
+      return;
+    }
+
+    if (newPassword && newPassword.length > 0 && newPassword.length < 6) {
+      setMessage({ type: 'error', text: 'Password harus minimal 6 karakter.' });
+      return;
+    }
+    
+    setIsResetting(true);
+    setMessage(null);
+    const result = await updateAdminCredentials(targetAdmin, newUsername, newPassword);
+    
+    if (result.error) {
+      setMessage({ type: 'error', text: result.error });
+    } else {
+      setMessage({ type: 'success', text: `Data kredensial admin berhasil diubah!` });
+      setNewPassword("");
+      setTimeout(() => setMessage(null), 3000);
+    }
+    setIsResetting(false);
+  };
 
   const handleChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -34,7 +75,6 @@ export function SettingsForm({ initialData }: { initialData: SettingsData }) {
       setMessage({ type: 'error', text: result.error });
     } else {
       setMessage({ type: 'success', text: 'Pengaturan berhasil disimpan!' });
-      // auto hide success message
       setTimeout(() => setMessage(null), 3000);
     }
     
@@ -42,13 +82,13 @@ export function SettingsForm({ initialData }: { initialData: SettingsData }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="space-y-6">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Pengaturan Sistem</h1>
           <p className="text-muted-foreground">Kelola konfigurasi inti, operasional, dan informasi bisnis.</p>
         </div>
-        <Button type="submit" disabled={isSaving} className="gap-2">
+        <Button onClick={handleSubmit} disabled={isSaving} className="gap-2">
           {isSaving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
           Simpan Perubahan
         </Button>
@@ -66,6 +106,9 @@ export function SettingsForm({ initialData }: { initialData: SettingsData }) {
           <TabsTrigger value="business" className="py-2.5 px-4 shrink-0 snap-start">Info Bisnis</TabsTrigger>
           <TabsTrigger value="queue" className="py-2.5 px-4 shrink-0 snap-start">Antrean</TabsTrigger>
           <TabsTrigger value="branding" className="py-2.5 px-4 shrink-0 snap-start">Branding</TabsTrigger>
+          {userRole === "owner" && (
+            <TabsTrigger value="admin_accounts" className="py-2.5 px-4 shrink-0 snap-start text-warning data-[state=active]:text-warning">Akun Admin</TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="operational" className="space-y-6">
@@ -313,7 +356,73 @@ export function SettingsForm({ initialData }: { initialData: SettingsData }) {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {userRole === "owner" && (
+          <TabsContent value="admin_accounts" className="space-y-6">
+            <Card className="bg-surface border-warning/30 border-2 shadow-[0_0_15px_rgba(255,204,0,0.1)]">
+              <CardHeader>
+                <CardTitle className="text-warning flex items-center gap-2">
+                  <KeyRound size={20} />
+                  Kelola Password Admin Cabang
+                </CardTitle>
+                <CardDescription>Ubah password untuk admin cabang tertentu. Hanya Owner yang dapat melihat panel ini.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleResetPassword} className="space-y-4 max-w-md">
+                  <div className="space-y-2">
+                    <Label>Pilih Akun Admin</Label>
+                    <select 
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-warning"
+                      value={targetAdmin}
+                      onChange={(e) => setTargetAdmin(e.target.value)}
+                    >
+                      {adminAccounts.map((admin) => (
+                        <option key={admin.user_id} value={admin.user_id}>
+                          {admin.branch_name} ({admin.username})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Username Baru (Opsional)</Label>
+                    <Input 
+                      type="text" 
+                      placeholder="Username baru" 
+                      value={newUsername}
+                      onChange={(e) => setNewUsername(e.target.value)}
+                      className="focus-visible:ring-warning"
+                    />
+                    <p className="text-xs text-muted-foreground">Biarkan tetap jika tidak ingin mengubah username.</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Password Baru (Opsional)</Label>
+                    <Input 
+                      type="text" 
+                      placeholder="Minimal 6 karakter" 
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      minLength={6}
+                      className="focus-visible:ring-warning"
+                    />
+                    <p className="text-xs text-muted-foreground">Kosongkan jika hanya ingin mengganti username.</p>
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    disabled={isResetting} 
+                    className="w-full bg-warning text-black hover:bg-warning/90 mt-2"
+                  >
+                    {isResetting ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
+                    Simpan Perubahan Akun
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
       </Tabs>
-    </form>
+    </div>
   );
 }

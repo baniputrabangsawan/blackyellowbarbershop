@@ -6,12 +6,12 @@ import { revalidatePath } from "next/cache";
 import { verifyAdmin } from "@/lib/auth";
 
 export async function getTodayQueues() {
-  const { isAuthorized } = await verifyAdmin();
+  const { isAuthorized, branchId } = await verifyAdmin();
   if (!isAuthorized) throw new Error("Unauthorized");
   const supabase = await createClient();
   const today = new Date().toISOString().split("T")[0];
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("queues")
     .select(`
       *,
@@ -20,6 +20,12 @@ export async function getTodayQueues() {
     `)
     .eq("queue_date", today)
     .order("queue_number", { ascending: true });
+
+  if (branchId) {
+    query = query.eq("branch_id", branchId);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error("Error fetching queues", error);
@@ -35,15 +41,17 @@ export async function updateQueueStatus(queueId: string, status: string) {
   const supabase = await createClient();
   
   const updateData: any = { status };
+  const now = new Date().toISOString();
   
   if (status === "called") {
-    updateData.called_at = new Date().toISOString();
+    updateData.called_at = now;
   } else if (status === "in_service") {
-    updateData.started_at = new Date().toISOString();
+    updateData.called_at = now; // Set called_at juga agar data akurat
+    updateData.started_at = now;
   } else if (status === "completed") {
-    updateData.completed_at = new Date().toISOString();
+    updateData.completed_at = now;
   } else if (status === "cancelled" || status === "no_show") {
-    updateData.cancelled_at = new Date().toISOString();
+    updateData.cancelled_at = now;
   }
 
   const { error } = await supabase

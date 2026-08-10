@@ -12,12 +12,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
-import { Loader2, Phone, Plus, Trash2, RefreshCw, AlertTriangle } from "lucide-react";
+import { Loader2, Phone, Plus, Trash2, RefreshCw, AlertTriangle, MapPin } from "lucide-react";
 import { format } from "date-fns";
 
-export function AdminQueueClient({ initialQueues, options }: { initialQueues: any[], options?: any }) {
+export function AdminQueueClient({ initialQueues, options, userBranchId }: { initialQueues: any[], options?: any, userBranchId?: string | null }) {
   const [prevInitial, setPrevInitial] = useState(initialQueues);
   const [queues, setQueues] = useState(initialQueues);
+  
+  // State for branch selection
+  const branches = options?.branches || [];
+  const [activeBranchId, setActiveBranchId] = useState<string>(userBranchId || branches[0]?.id || "");
   
   // Sync state with server props when revalidatePath occurs (Official React Pattern)
   if (initialQueues !== prevInitial) {
@@ -63,6 +67,16 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
             ));
           } else if (payload.eventType === 'DELETE') {
             setQueues(prev => prev.filter(q => q.id !== payload.old.id));
+          } else if (payload.eventType === 'INSERT') {
+            // Revalidate path handles new inserts from the client mostly, but for realtime we can append
+             setQueues(prev => {
+                const exists = prev.find(q => q.id === payload.new.id);
+                if (exists) return prev;
+                // Fetch complete details might be missing here if just appending payload.new, 
+                // so we rely on server revalidate for full join data (like barber name, service name).
+                // However, we append it minimally to show it immediately.
+                return [...prev, payload.new];
+             });
           }
         }
       )
@@ -101,8 +115,8 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
 
   const handleAddQueue = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!options?.branches?.[0]?.id) {
-      alert("Tidak ada cabang yang aktif!");
+    if (!activeBranchId) {
+      alert("Tidak ada cabang yang aktif dipilih!");
       return;
     }
 
@@ -114,7 +128,7 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
     formData.append("phone", phone || "080000000000"); 
     formData.append("serviceId", serviceId);
     if (barberId) formData.append("preferredBarberId", barberId);
-    formData.append("branchId", options.branches[0].id); // Gunakan cabang pertama secara default
+    formData.append("branchId", activeBranchId);
 
     const result = await createQueue(formData);
     
@@ -131,17 +145,13 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
     setIsAdding(false);
   };
 
-  const activeQueuesCount = queues.filter(q => ['waiting', 'called', 'in_service'].includes(q.status)).length;
-  const waitingQueuesCount = queues.filter(q => q.status === 'waiting').length;
-  const inServiceQueuesCount = queues.filter(q => ['called', 'in_service'].includes(q.status)).length;
-
   const handleResetQueue = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!options?.branches?.[0]?.id) return;
+    if (!activeBranchId) return;
 
     setIsResetting(true);
-    const result = await resetTodayQueue(options.branches[0].id, resetReason || "Dibatalkan massal oleh admin");
+    const result = await resetTodayQueue(activeBranchId, resetReason || "Dibatalkan massal oleh admin");
     
     if (result.success) {
       setIsResetOpen(false);
@@ -164,15 +174,43 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
     }
   };
 
+  // Filter queues based on the active branch
+  const filteredQueues = queues.filter(q => q.branch_id === activeBranchId);
+
+  const activeQueuesCount = filteredQueues.filter(q => ['waiting', 'called', 'in_service'].includes(q.status)).length;
+  const waitingQueuesCount = filteredQueues.filter(q => q.status === 'waiting').length;
+  const inServiceQueuesCount = filteredQueues.filter(q => ['called', 'in_service'].includes(q.status)).length;
+  const activeBranchName = branches.find((b: any) => b.id === activeBranchId)?.name || "Cabang";
+
   return (
     <div className="grid gap-4">
+      {/* Tab Cabang */}
+      {!userBranchId && branches.length > 1 && (
+        <div className="flex space-x-2 p-1 bg-surface-elevated rounded-lg w-full max-w-md mb-2 border border-border">
+          {branches.map((branch: any) => (
+            <button
+              key={branch.id}
+              onClick={() => setActiveBranchId(branch.id)}
+              className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${
+                activeBranchId === branch.id
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-white/5"
+              }`}
+            >
+              <MapPin size={16} />
+              {branch.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Tombol Aksi */}
       <div className="flex justify-between items-center mb-2">
         <div>
           <Dialog open={isResetOpen} onOpenChange={setIsResetOpen}>
             <DialogTrigger render={<Button variant="outline" className="text-destructive border-destructive/50 hover:bg-destructive/10" />}>
               <RefreshCw className="w-4 h-4 mr-2" />
-              Reset Antrean
+              Reset Antrean {branches.length > 1 ? "Cabang Ini" : ""}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] bg-surface border-border">
               <DialogHeader>
@@ -182,7 +220,7 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
                 </DialogTitle>
                 <DialogDescription className="pt-2">
                   Anda akan membatalkan <strong className="text-foreground">{activeQueuesCount} antrean aktif</strong> saat ini 
-                  ({waitingQueuesCount} menunggu, {inServiceQueuesCount} dilayani).
+                  ({waitingQueuesCount} menunggu, {inServiceQueuesCount} dilayani) di <strong>{activeBranchName}</strong>.
                   Tindakan ini tidak akan menghapus data, melainkan mengubah statusnya menjadi Batal.
                 </DialogDescription>
               </DialogHeader>
@@ -215,7 +253,7 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px] bg-surface border-border">
             <DialogHeader>
-              <DialogTitle>Tambah Antrean Offline (Walk-in)</DialogTitle>
+              <DialogTitle>Tambah Antrean Offline di {activeBranchName}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleAddQueue} className="space-y-4 mt-4">
               <div className="space-y-2">
@@ -278,14 +316,14 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
         </Dialog>
       </div>
 
-      {queues.length === 0 ? (
+      {filteredQueues.length === 0 ? (
         <Card className="bg-surface border-border">
           <CardContent className="p-8 text-center text-muted-foreground">
-            Belum ada antrean untuk hari ini.
+            Belum ada antrean untuk {activeBranchName} hari ini.
           </CardContent>
         </Card>
       ) : (
-        queues.map((queue) => {
+        filteredQueues.map((queue) => {
           const isDone = ['completed', 'cancelled', 'no_show'].includes(queue.status);
           
           return (
@@ -296,7 +334,7 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
                   <div className="bg-surface-elevated p-6 md:w-48 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-border shrink-0">
                     <span className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Nomor</span>
                     <span className="font-heading text-4xl font-bold text-foreground mb-3">
-                      B{queue.queue_number.toString().padStart(2, '0')}
+                      B{queue.queue_number?.toString().padStart(2, '0') || '00'}
                     </span>
                     {getStatusBadge(queue.status)}
                   </div>
@@ -323,7 +361,7 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
                       <div>
                         <span className="text-muted-foreground">Waktu Masuk: </span>
                         <span className="font-medium text-foreground">
-                          {format(new Date(queue.joined_at), 'HH:mm')}
+                          {queue.joined_at ? format(new Date(queue.joined_at), 'HH:mm') : ''}
                         </span>
                       </div>
                       <div>
@@ -343,8 +381,8 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
                       <>
                         {queue.status === 'waiting' && (
                           <>
-                            <Button onClick={() => handleStatusChange(queue.id, 'called')} className="w-full bg-primary text-primary-foreground hover:bg-primary-hover">
-                              Panggil
+                            <Button onClick={() => handleStatusChange(queue.id, 'in_service')} className="w-full bg-primary text-primary-foreground hover:bg-primary-hover">
+                              Mulai
                             </Button>
                             <div className="flex gap-2">
                                <Button onClick={() => handleStatusChange(queue.id, 'no_show')} variant="outline" className="flex-1 text-xs px-2 border-destructive/50 text-destructive hover:bg-destructive/10">
@@ -357,17 +395,6 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
                           </>
                         )}
                         
-                        {queue.status === 'called' && (
-                          <>
-                            <Button onClick={() => handleStatusChange(queue.id, 'in_service')} className="w-full bg-success text-white hover:bg-success/90">
-                              Mulai Layanan
-                            </Button>
-                            <Button onClick={() => handleStatusChange(queue.id, 'waiting')} variant="outline" className="w-full hover:bg-white/5">
-                              Kembali Menunggu
-                            </Button>
-                          </>
-                        )}
-                        
                         {queue.status === 'in_service' && (
                           <Button onClick={() => handleStatusChange(queue.id, 'completed')} className="w-full bg-success text-white hover:bg-success/90">
                             Selesaikan
@@ -377,7 +404,7 @@ export function AdminQueueClient({ initialQueues, options }: { initialQueues: an
                         {isDone && (
                           <>
                             <div className="text-center text-sm text-muted-foreground italic mb-2">
-                              Selesai pada {queue.completed_at ? format(new Date(queue.completed_at), 'HH:mm') : format(new Date(queue.cancelled_at), 'HH:mm')}
+                              Selesai pada {queue.completed_at ? format(new Date(queue.completed_at), 'HH:mm') : queue.cancelled_at ? format(new Date(queue.cancelled_at), 'HH:mm') : ''}
                             </div>
                             <Button onClick={() => handleDelete(queue.id)} variant="ghost" size="sm" className="w-full text-destructive hover:bg-destructive/10 hover:text-destructive">
                               Hapus Permanen
