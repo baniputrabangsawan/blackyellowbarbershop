@@ -186,7 +186,7 @@ export function AdminQueueClient({ initialQueues, options, userBranchId }: { ini
     <div className="grid gap-4">
       {/* Tab Cabang */}
       {!userBranchId && branches.length > 1 && (
-        <div className="flex space-x-2 p-1 bg-surface-elevated rounded-lg w-full max-w-md mb-2 border border-border">
+        <div className="flex flex-col sm:flex-row gap-2 p-1 bg-surface-elevated rounded-lg w-full max-w-md mb-2 border border-border">
           {branches.map((branch: any) => (
             <button
               key={branch.id}
@@ -205,10 +205,10 @@ export function AdminQueueClient({ initialQueues, options, userBranchId }: { ini
       )}
 
       {/* Tombol Aksi */}
-      <div className="flex justify-between items-center mb-2">
-        <div>
+      <div className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:items-center mb-4">
+        <div className="w-full sm:w-auto">
           <Dialog open={isResetOpen} onOpenChange={setIsResetOpen}>
-            <DialogTrigger render={<Button variant="outline" className="text-destructive border-destructive/50 hover:bg-destructive/10" />}>
+            <DialogTrigger render={<Button variant="outline" className="w-full text-destructive border-destructive/50 hover:bg-destructive/10" />}>
               <RefreshCw className="w-4 h-4 mr-2" />
               Reset Antrean {branches.length > 1 ? "Cabang Ini" : ""}
             </DialogTrigger>
@@ -246,11 +246,12 @@ export function AdminQueueClient({ initialQueues, options, userBranchId }: { ini
           </Dialog>
         </div>
         
-        <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-          <DialogTrigger render={<Button className="bg-primary text-primary-foreground hover:bg-primary/90" />}>
-            <Plus className="w-4 h-4 mr-2" />
-            Tambah Antrean Offline
-          </DialogTrigger>
+        <div className="w-full sm:w-auto">
+          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+            <DialogTrigger render={<Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90" />}>
+              <Plus className="w-4 h-4 mr-2" />
+              Tambah Antrean Offline
+            </DialogTrigger>
           <DialogContent className="sm:max-w-[425px] bg-surface border-border">
             <DialogHeader>
               <DialogTitle>Tambah Antrean Offline di {activeBranchName}</DialogTitle>
@@ -314,6 +315,7 @@ export function AdminQueueClient({ initialQueues, options, userBranchId }: { ini
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {filteredQueues.length === 0 ? (
