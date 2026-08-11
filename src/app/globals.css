@@ -18,6 +18,9 @@
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
   
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  
   --color-border: var(--border);
   --color-input: var(--border);
   --color-ring: var(--primary);

@@ -55,7 +55,7 @@ export function AdminMobileNav() {
 
   return (
     <>
-      <header className="md:hidden p-4 border-b border-border bg-surface-elevated flex justify-between items-center z-50 relative">
+      <header className="md:hidden sticky top-0 p-4 border-b border-border bg-surface-elevated flex justify-between items-center z-50">
         <div className="flex items-center gap-4">
           <button onClick={() => setIsOpen(!isOpen)} className="text-foreground p-1 hover:text-primary transition-colors">
             {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -85,7 +85,7 @@ export function AdminMobileNav() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="absolute top-[73px] left-0 w-full bg-surface-elevated border-b border-border shadow-xl md:hidden z-40 overflow-hidden"
+              className="fixed top-[73px] left-0 w-full bg-surface-elevated border-b border-border shadow-xl md:hidden z-40 overflow-hidden"
             >
               <nav className="flex flex-col p-4 space-y-4 overflow-y-auto max-h-[calc(100vh-73px)]">
                 {adminGroups.map((group, groupIdx) => (
