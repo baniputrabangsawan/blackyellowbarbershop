@@ -32,7 +32,6 @@ export function QueuePreviewSection({ settings: initialSettings, initialStatuses
 
   useEffect(() => {
     let pollInterval: NodeJS.Timeout | null = null;
-    let isPolling = false;
     let isDisposed = false;
 
     const fetchQueueStatus = async (branchId: string, branchName: string) => {
@@ -43,37 +42,48 @@ export function QueuePreviewSection({ settings: initialSettings, initialStatuses
       return { id: branchId, name: branchName, ...liveStatus, storeState } as BranchStatus;
     };
 
-    const startPolling = async () => {
-      // Fetch ALL active branches (only needed for polling structure, but we already have initialStatuses)
+    const refreshQueues = async () => {
       const branches = initialStatuses.map(s => ({ id: s.id, name: s.name }));
       if (branches.length > 0 && !isDisposed) {
-        // We already have initial data, start polling right away
-        pollInterval = setInterval(async () => {
-          if (isDisposed || isPolling) return;
-          isPolling = true;
-
-          try {
-            const newStatuses = await Promise.all(branches.map(b => fetchQueueStatus(b.id, b.name)));
-            if (isDisposed) return;
+        try {
+          const newStatuses = await Promise.all(branches.map(b => fetchQueueStatus(b.id, b.name)));
+          if (!isDisposed) {
             setBranchStatuses(newStatuses);
-          } catch (e) {
-            console.error("Polling error", e);
-          } finally {
-            isPolling = false;
           }
-        }, 10000); // 10 seconds polling
+        } catch (e) {
+          console.error("Queue refresh error", e);
+        }
       }
     };
 
-    startPolling();
+    // Polling lambat (30 detik) sebagai fallback / penjaga
+    pollInterval = setInterval(refreshQueues, 30000);
+
+    // Subscribe Realtime ke tabel queues & site_settings untuk update instan
+    const channel = supabase
+      .channel('public-queue-updates')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'queues' },
+        () => {
+          refreshQueues();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'site_settings' },
+        () => {
+          refreshQueues();
+        }
+      )
+      .subscribe();
 
     return () => {
       isDisposed = true;
-      if (pollInterval) {
-        clearInterval(pollInterval);
-      }
+      if (pollInterval) clearInterval(pollInterval);
+      supabase.removeChannel(channel);
     };
-  }, [supabase]);
+  }, [supabase, initialStatuses]);
 
   // Determine if AT LEAST ONE store is open to allow clicking the Ambil Antrean button
   const isAnyStoreOpen = branchStatuses.some(s => s.storeState === 'open');
