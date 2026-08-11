@@ -115,8 +115,8 @@ export function SiteFooter({ settings: initialSettings }: { settings?: SiteSetti
             {new Date().getFullYear()} {settings?.business_name || "Black Yellow Barbershop"}. All rights reserved.
           </p>
           <div className="flex gap-6">
-            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
+            <span>Privacy Policy</span>
+            <span>Terms of Service</span>
           </div>
         </div>
       </div>
