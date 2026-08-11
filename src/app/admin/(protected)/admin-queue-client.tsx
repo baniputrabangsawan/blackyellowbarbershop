@@ -220,7 +220,7 @@ export function AdminQueueClient({
               <RefreshCw className="w-4 h-4 mr-2" />
               Reset Antrean {branches.length > 1 ? "Cabang Ini" : ""}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] bg-surface border-border">
+            <DialogContent className="sm:max-w-[425px] bg-background border-border">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2 text-destructive">
                   <AlertTriangle className="w-5 h-5" />
@@ -260,7 +260,7 @@ export function AdminQueueClient({
               <Plus className="w-4 h-4 mr-2" />
               Tambah Antrean Offline
             </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px] bg-surface border-border">
+          <DialogContent className="sm:max-w-[425px] bg-background border-border">
             <DialogHeader>
               <DialogTitle>Tambah Antrean Offline di {activeBranchName}</DialogTitle>
             </DialogHeader>
