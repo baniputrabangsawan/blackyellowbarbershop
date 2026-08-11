@@ -77,12 +77,12 @@ export function SettingsForm({ initialData, userRole, adminAccounts = [] }: { in
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Pengaturan Sistem</h1>
           <p className="text-muted-foreground">Kelola konfigurasi inti, operasional, dan informasi bisnis.</p>
         </div>
-        <Button onClick={handleSubmit} disabled={isSaving} className="gap-2">
+        <Button onClick={handleSubmit} disabled={isSaving} className="gap-2 shrink-0 w-full sm:w-auto">
           {isSaving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
           Simpan Perubahan
         </Button>

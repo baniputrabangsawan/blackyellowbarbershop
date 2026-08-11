@@ -35,7 +35,7 @@ export function HomepageForm({ initialSettings }: { initialSettings: SiteSetting
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <div className="flex justify-between items-end mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Halaman Utama</h1>
           <p className="text-muted-foreground">Kelola teks dan tampilan beranda website publik.</p>

@@ -68,7 +68,7 @@ export function AdminMobileNav() {
         )}
       </AnimatePresence>
 
-      <header className="p-4 border-b border-border bg-surface-elevated flex justify-between items-center relative z-20">
+      <header className="p-4 border-b border-border bg-background flex justify-between items-center relative z-20">
         <div className="flex items-center gap-4">
           <button onClick={() => setIsOpen(!isOpen)} className="text-foreground p-1 hover:text-primary transition-colors">
             {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -90,7 +90,7 @@ export function AdminMobileNav() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="absolute left-0 w-full bg-surface-elevated border-b border-border shadow-xl overflow-hidden z-10"
+            className="absolute left-0 w-full bg-background border-b border-border shadow-xl overflow-hidden z-10"
             style={{ top: '100%' }}
           >
             <nav className="flex flex-col p-4 space-y-4 overflow-y-auto max-h-[calc(100vh-73px)]">
