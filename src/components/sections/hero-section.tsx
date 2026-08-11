@@ -21,22 +21,18 @@ export function HeroSection({ settings: initialSettings }: { settings?: SiteSett
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background z-10" />
         <Image
-          src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=2074&auto=format&fit=crop"
+          src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=1080&auto=format&fit=crop"
           alt="Interior Black Yellow Barbershop Makassar - Tempat cukur rambut premium"
           fill
           priority
+          fetchPriority="high"
           sizes="100vw"
           className="object-cover object-center"
         />
       </div>
 
       <div className="container relative z-20 mx-auto max-w-7xl px-6 md:px-12 flex flex-col items-center md:items-start text-center md:text-left pt-20">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="max-w-3xl"
-        >
+        <div className="max-w-3xl animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out fill-mode-both">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-elevated border border-border mb-6">
             <span className={`w-2 h-2 rounded-full animate-pulse ${
               (() => {
