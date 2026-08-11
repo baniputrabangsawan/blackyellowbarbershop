@@ -142,7 +142,7 @@ export function GalleryClient({ initialGalleries }: { initialGalleries: GalleryI
             <Plus className="w-4 h-4 mr-2" />
             Tambah Foto
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px] bg-surface border-border">
+          <DialogContent className="sm:max-w-[500px] bg-background border-border">
             <DialogHeader>
               <DialogTitle>{editingId ? "Edit Foto Galeri" : "Tambah Foto Baru"}</DialogTitle>
             </DialogHeader>

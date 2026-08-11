@@ -122,7 +122,7 @@ export function PromoClient({ initialPromos }: { initialPromos: Promo[] }) {
             <Plus className="w-4 h-4 mr-2" />
             Buat Promo Baru
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px] bg-surface border-border max-h-[90vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-[600px] bg-background border-border max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingId ? "Edit Promo" : "Buat Promo / Pengumuman"}</DialogTitle>
             </DialogHeader>

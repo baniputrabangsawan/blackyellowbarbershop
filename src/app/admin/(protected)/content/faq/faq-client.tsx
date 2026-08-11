@@ -100,7 +100,7 @@ export function FaqClient({ initialFaqs }: { initialFaqs: Faq[] }) {
             <Plus className="w-4 h-4 mr-2" />
             Tambah FAQ
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px] bg-surface border-border">
+          <DialogContent className="sm:max-w-[500px] bg-background border-border">
             <DialogHeader>
               <DialogTitle>{editingId ? "Edit FAQ" : "Tambah FAQ Baru"}</DialogTitle>
             </DialogHeader>
