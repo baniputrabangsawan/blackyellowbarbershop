@@ -45,7 +45,7 @@ export function AdminDesktopNav() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 bg-surface-elevated border-r border-border hidden md:flex flex-col h-full">
+    <aside className="w-64 bg-surface-elevated border-r border-border hidden md:flex flex-col sticky top-0 h-screen shrink-0">
       <div className="p-6 border-b border-border shrink-0">
         <Link href="/admin" className="font-heading text-xl font-bold uppercase tracking-tight text-primary">
           Black<span className="text-foreground">Yellow</span> <span className="text-muted-foreground text-sm">Admin</span>

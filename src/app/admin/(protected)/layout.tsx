@@ -38,15 +38,15 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
 
   return (
-    <div className="flex h-dvh bg-background overflow-hidden">
+    <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
       {/* Sidebar Desktop */}
       <AdminDesktopNav />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto bg-background relative">
+      <main className="flex-1 bg-background relative flex flex-col w-full overflow-x-hidden">
         <AdminMobileNav />
-        <div className="p-6 md:p-8">
+        <div className="p-6 md:p-8 flex-1">
           {children}
         </div>
       </main>
