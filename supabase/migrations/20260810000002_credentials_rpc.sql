@@ -29,8 +29,7 @@ BEGIN
     COALESCE(b.name, 'Semua Cabang (Owner)') AS branch_name
   FROM public.admin_users au
   JOIN auth.users u ON au.user_id = u.id
-  LEFT JOIN public.branches b ON au.branch_id = b.id
-  WHERE au.role != 'owner';
+  LEFT JOIN public.branches b ON au.branch_id = b.id;
 END;
 $$;
 
