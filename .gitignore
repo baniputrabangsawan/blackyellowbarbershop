@@ -42,3 +42,7 @@ next-env.d.ts
 
 # markdown
 *.md
+
+# supabase
+supabase/.temp/
+.supabase/
