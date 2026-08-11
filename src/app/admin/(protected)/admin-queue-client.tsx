@@ -216,11 +216,9 @@ export function AdminQueueClient({
       <div className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:items-center mb-4">
         <div className="w-full sm:w-auto">
           <Dialog open={isResetOpen} onOpenChange={setIsResetOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="w-full text-destructive border-destructive/50 hover:bg-destructive/10">
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Reset Antrean {branches.length > 1 ? "Cabang Ini" : ""}
-              </Button>
+            <DialogTrigger render={<Button variant="outline" className="w-full text-destructive border-destructive/50 hover:bg-destructive/10" />}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Reset Antrean {branches.length > 1 ? "Cabang Ini" : ""}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] bg-background border-border">
               <DialogHeader>
@@ -258,11 +256,9 @@ export function AdminQueueClient({
         
         <div className="w-full sm:w-auto">
           <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-            <DialogTrigger asChild>
-              <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-                <Plus className="w-4 h-4 mr-2" />
-                Tambah Antrean Offline
-              </Button>
+            <DialogTrigger render={<Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90" />}>
+              <Plus className="w-4 h-4 mr-2" />
+              Tambah Antrean Offline
             </DialogTrigger>
           <DialogContent className="sm:max-w-[425px] bg-background border-border">
             <DialogHeader>
