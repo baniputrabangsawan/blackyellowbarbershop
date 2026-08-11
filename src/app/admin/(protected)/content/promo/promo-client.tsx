@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
+import type { Promo } from "@/types";
 
 import { useState } from "react";
 import { createPromo, updatePromo, deletePromo } from "@/actions/admin-promo";
@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Loader2, Plus, Pencil, Trash2, CalendarClock } from "lucide-react";
 import { format } from "date-fns";
 
-export function PromoClient({ initialPromos }: { initialPromos: any[] }) {
+export function PromoClient({ initialPromos }: { initialPromos: Promo[] }) {
   const [promos, setPromos] = useState(initialPromos);
   const [isOpen, setIsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -44,7 +44,7 @@ export function PromoClient({ initialPromos }: { initialPromos: any[] }) {
     setIsOpen(true);
   };
 
-  const handleOpenEdit = (promo: any) => {
+  const handleOpenEdit = (promo: Promo) => {
     setEditingId(promo.id);
     setTitle(promo.title);
     setDescription(promo.description || "");
@@ -53,7 +53,7 @@ export function PromoClient({ initialPromos }: { initialPromos: any[] }) {
     setEndDate(promo.end_date ? new Date(promo.end_date).toISOString().slice(0, 16) : "");
     setCtaText(promo.cta_text || "");
     setCtaUrl(promo.cta_url || "");
-    setIsActive(promo.is_active);
+    setIsActive(promo.is_active ?? true);
     setIsOpen(true);
   };
 
@@ -74,7 +74,7 @@ export function PromoClient({ initialPromos }: { initialPromos: any[] }) {
     if (editingId) {
       const res = await updatePromo(editingId, data);
       if (res.success) {
-        setPromos(promos.map((p) => (p.id === editingId ? { ...p, ...data } : p)));
+        setPromos(promos.map((p) => (p.id === editingId ? { ...p, ...data, id: editingId } : p)));
         setIsOpen(false);
       } else {
         alert("Gagal memperbarui: " + res.error);
@@ -101,11 +101,11 @@ export function PromoClient({ initialPromos }: { initialPromos: any[] }) {
     }
   };
 
-  const handleToggleActive = async (promo: any, checked: boolean) => {
+  const handleToggleActive = async (promo: Promo, checked: boolean) => {
     setPromos(promos.map(p => p.id === promo.id ? { ...p, is_active: checked } : p));
     await updatePromo(promo.id, { 
       title: promo.title, 
-      description: promo.description,
+      description: promo.description || '',
       start_date: promo.start_date,
       end_date: promo.end_date,
       cta_text: promo.cta_text,

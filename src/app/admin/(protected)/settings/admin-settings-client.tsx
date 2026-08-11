@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import type { Branch, SiteSettings } from "@/types";
 
 import { useState } from "react";
 import { updateBranchStatus, updateHeroSettings, resetTodayQueue } from "@/actions/admin-settings";
@@ -10,7 +10,11 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Loader2, Store, RefreshCw, Type } from "lucide-react";
 
-export function AdminSettingsClient({ initialSettings }: { initialSettings: any }) {
+export function AdminSettingsClient({ 
+  initialSettings 
+}: { 
+  initialSettings: { branch: Branch | null, siteSettings: SiteSettings | null } 
+}) {
   const [branchActive, setBranchActive] = useState(initialSettings.branch?.is_active ?? true);
   const [heroTitle, setHeroTitle] = useState(initialSettings.siteSettings?.hero_title ?? "");
   const [heroSubtitle, setHeroSubtitle] = useState(initialSettings.siteSettings?.hero_subtitle ?? "");

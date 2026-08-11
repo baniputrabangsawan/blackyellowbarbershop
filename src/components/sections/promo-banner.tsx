@@ -1,12 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import type { Promo } from "@/types";
 
 import Link from "next/link";
 import { ArrowRight, TicketPercent, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
 
-export function PromoBanner({ promos }: { promos: any[] }) {
+export function PromoBanner({ promos }: { promos: Promo[] }) {
   const [isVisible, setIsVisible] = useState(true);
 
   if (!promos || promos.length === 0) return null;

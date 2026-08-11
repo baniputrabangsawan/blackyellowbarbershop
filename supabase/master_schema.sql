@@ -185,6 +185,16 @@ CREATE TABLE IF NOT EXISTS public.promos (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS public.testimonials (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  content TEXT NOT NULL,
+  rating INTEGER NOT NULL DEFAULT 5 CHECK (rating >= 1 AND rating <= 5),
+  sort_order INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- 3. MENGAKTIFKAN ROW LEVEL SECURITY (RLS)
 ALTER TABLE public.admin_users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.branches ENABLE ROW LEVEL SECURITY;
@@ -199,6 +209,7 @@ ALTER TABLE public.admin_activity_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.galleries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.faqs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.promos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.testimonials ENABLE ROW LEVEL SECURITY;
 
 -- Hapus kebijakan lama agar tidak bentrok (wajib jika database sudah ada isinya)
 DO $$ DECLARE r RECORD; BEGIN FOR r IN (SELECT tablename, policyname FROM pg_policies WHERE schemaname = 'public') LOOP EXECUTE format('DROP POLICY IF EXISTS "%s" ON public.%I', r.policyname, r.tablename); END LOOP; END $$;
@@ -210,7 +221,7 @@ CREATE POLICY "Admin view admin_users" ON public.admin_users FOR SELECT TO authe
 
 -- Tabel Publik (Bisa dibaca siapa saja, diubah oleh admin)
 DO $$ 
-DECLARE t TEXT; pub_tables TEXT[] := ARRAY['branches', 'business_hours', 'services', 'barbers', 'membership_plans', 'site_settings', 'galleries', 'faqs', 'promos'];
+DECLARE t TEXT; pub_tables TEXT[] := ARRAY['branches', 'business_hours', 'services', 'barbers', 'membership_plans', 'site_settings', 'galleries', 'faqs', 'promos', 'testimonials'];
 BEGIN
     FOREACH t IN ARRAY pub_tables LOOP
         EXECUTE format('CREATE POLICY "Public read on %I" ON public.%I FOR SELECT USING (true)', t, t);
@@ -218,10 +229,11 @@ BEGIN
     END LOOP;
 END $$;
 
--- Queues (Baca Publik, Modifikasi Admin) - Insert via RPC
-CREATE POLICY "Public read queues" ON public.queues FOR SELECT USING (true);
+-- Queues (Modifikasi Admin, Read via RPC/Service Role) - Insert via RPC
+-- Note: SELECT is intentionally NOT given to public to prevent phone number exposure.
 CREATE POLICY "Admin update queues" ON public.queues FOR UPDATE TO authenticated USING (public.is_admin());
 CREATE POLICY "Admin delete queues" ON public.queues FOR DELETE TO authenticated USING (public.is_admin());
+CREATE POLICY "Admin select queues" ON public.queues FOR SELECT TO authenticated USING (public.is_admin());
 
 -- Memberships (Admin Full Access) - Insert via RPC
 CREATE POLICY "Admin access memberships" ON public.memberships FOR ALL TO authenticated USING (public.is_admin()) WITH CHECK (public.is_admin());

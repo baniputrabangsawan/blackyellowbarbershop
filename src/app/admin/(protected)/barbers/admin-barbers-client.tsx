@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import type { Barber } from "@/types";
 
 import { useState } from "react";
 import { updateBarberStatus, updateBarber, deleteBarber, addBarber } from "@/actions/admin-barbers";
@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Edit2, Save, X, Trash2, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
-export function AdminBarbersClient({ initialBarbers }: { initialBarbers: any[] }) {
+export function AdminBarbersClient({ initialBarbers }: { initialBarbers: Barber[] }) {
   const [barbers, setBarbers] = useState(initialBarbers);
   const [loadingId, setLoadingId] = useState<string | null>(null);
   
@@ -36,7 +36,7 @@ export function AdminBarbersClient({ initialBarbers }: { initialBarbers: any[] }
     setLoadingId(null);
   };
 
-  const handleEditClick = (barber: any) => {
+  const handleEditClick = (barber: Barber) => {
     setEditingId(barber.id);
     setEditName(barber.name);
   };
@@ -202,7 +202,7 @@ export function AdminBarbersClient({ initialBarbers }: { initialBarbers: any[] }
                               size="sm"
                               variant="outline"
                               disabled={loadingId === barber.id}
-                              onClick={() => handleToggleStatus(barber.id, barber.is_active)}
+                              onClick={() => handleToggleStatus(barber.id, barber.is_active ?? true)}
                               className={barber.is_active ? "text-destructive hover:bg-destructive/10 hover:text-destructive border-border" : "text-success hover:bg-success/10 hover:text-success border-border"}
                             >
                               {loadingId === barber.id ? (

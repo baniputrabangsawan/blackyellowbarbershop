@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import type { GalleryItem } from "@/types";
 
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
-export function GallerySection({ galleries = [] }: { galleries?: any[] }) {
+export function GallerySection({ galleries = [] }: { galleries?: GalleryItem[] }) {
   // Jika tidak ada data dari props, bisa tampilkan fallback statis atau kosong
   const displayGalleries = galleries.length > 0 ? galleries : [];
 

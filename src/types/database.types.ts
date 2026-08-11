@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export type Json =
   | string
   | number
@@ -19,8 +19,8 @@ export interface Database {
           whatsapp: string | null
           is_active: boolean
         }
-        Insert: any
-        Update: any
+        Insert: Record<string, unknown>
+        Update: Record<string, unknown>
       }
       services: {
         Row: {
@@ -32,8 +32,8 @@ export interface Database {
           duration_minutes: number
           is_active: boolean
         }
-        Insert: any
-        Update: any
+        Insert: Record<string, unknown>
+        Update: Record<string, unknown>
       }
       barbers: {
         Row: {
@@ -41,8 +41,8 @@ export interface Database {
           name: string
           is_active: boolean
         }
-        Insert: any
-        Update: any
+        Insert: Record<string, unknown>
+        Update: Record<string, unknown>
       }
       queues: {
         Row: {
@@ -63,8 +63,8 @@ export interface Database {
           completed_at: string | null
           cancelled_at: string | null
         }
-        Insert: any
-        Update: any
+        Insert: Record<string, unknown>
+        Update: Record<string, unknown>
       }
     }
     Views: {

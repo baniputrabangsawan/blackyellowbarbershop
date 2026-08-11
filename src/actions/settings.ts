@@ -1,10 +1,11 @@
 import "server-only";
 
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { cache } from "react";
+import type { SiteSettings } from "@/types";
 
 export const getPublicSettings = cache(async function getPublicSettings() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data: siteSettings } = await supabase
     .from("site_settings")
     .select("*")
@@ -15,11 +16,11 @@ export const getPublicSettings = cache(async function getPublicSettings() {
     hero_title: "Potongan Presisi.",
     hero_subtitle: "Gaya Tanpa Kompromi.",
     hero_description: "Lebih dari sekadar pangkas rambut. Kami menghadirkan pengalaman premium dengan barber profesional untuk tampilan terbaik Anda."
-  };
+  } as SiteSettings;
 });
 
 export async function getPublicGalleries() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("galleries")
     .select("*")
@@ -30,7 +31,7 @@ export async function getPublicGalleries() {
 }
 
 export async function getPublicFaqs() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("faqs")
     .select("*")
@@ -41,7 +42,7 @@ export async function getPublicFaqs() {
 }
 
 export async function getPublicPromos() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("promos")
     .select("*")
@@ -59,11 +60,22 @@ export async function getPublicPromos() {
 }
 
 export async function getPublicBarbers() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("barbers")
     .select("*")
     .eq("is_active", true)
     .order("name", { ascending: true });
+  return data || [];
+}
+
+export async function getPublicTestimonials() {
+  const supabase = createPublicClient();
+  const { data } = await supabase
+    .from("testimonials")
+    .select("id, name, content, rating")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false });
   return data || [];
 }

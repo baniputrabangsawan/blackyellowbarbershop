@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import type { Service, Branch } from "@/types";
 
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -20,14 +20,14 @@ const BRANCH_WA_NUMBERS: Record<string, string> = {
  * Mencocokkan slug dari query param ke service ID dari database.
  * Slug format: "bronze-cuts" → match ke service dengan nama "Bronze Cuts".
  */
-function matchServiceBySlug(services: any[], slug: string): string | undefined {
+function matchServiceBySlug(services: Service[], slug: string): string | undefined {
   if (!slug) return undefined;
 
   // Normalisasi slug menjadi lowercase tanpa tanda hubung untuk perbandingan
   const normalizedSlug = slug.toLowerCase().replace(/-/g, " ");
 
   const matched = services.find(
-    (s: any) => s.name.toLowerCase() === normalizedSlug
+    (s: Service) => s.name.toLowerCase() === normalizedSlug
   );
 
   return matched?.id;
@@ -64,7 +64,7 @@ export function QueueForm({
   options,
   initialServiceSlug,
 }: {
-  options: any;
+  options: { branches: Branch[], services: Service[] };
   initialServiceSlug?: string;
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -92,10 +92,10 @@ export function QueueForm({
   const selectedServiceId = watch("serviceId");
   const selectedBranchId = watch("branchId");
   const selectedService = options.services.find(
-    (s: any) => s.id === selectedServiceId
+    (s: Service) => s.id === selectedServiceId
   );
   const selectedBranch = options.branches.find(
-    (b: any) => b.id === selectedBranchId
+    (b: Branch) => b.id === selectedBranchId
   );
 
   // Jika matchedServiceId berubah (misal: navigasi ulang), update form value
@@ -110,10 +110,10 @@ export function QueueForm({
 
     // Cari detail layanan dan cabang
     const serviceData = options.services.find(
-      (s: any) => s.id === data.serviceId
+      (s: Service) => s.id === data.serviceId
     );
     const branchData = options.branches.find(
-      (b: any) => b.id === data.branchId
+      (b: Branch) => b.id === data.branchId
     );
 
     const serviceName = serviceData?.name || "Layanan Tidak Diketahui";
@@ -161,7 +161,7 @@ Mohon info cara pembayarannya. Terima kasih.`;
               {...register("branchId")}
               className="flex w-full items-center justify-between rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
             >
-              {options.branches.map((b: any) => (
+              {options.branches.map((b: Branch) => (
                 <option key={b.id} value={b.id}>
                   {b.name}
                 </option>
@@ -253,7 +253,7 @@ Mohon info cara pembayarannya. Terima kasih.`;
                   />
                   <div className="relative z-50 mt-2 w-full overflow-y-visible rounded-md border border-border bg-popover text-popover-foreground shadow-sm animate-in slide-in-from-top-2 duration-150">
                     <div className="p-1">
-                      {options.services.map((s: any) => (
+                      {options.services.map((s: Service) => (
                         <button
                           key={s.id}
                           type="button"

@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import type { SiteSettings } from "@/types";
 
 import { useState } from "react";
 import { updateHeroSettings } from "@/actions/admin-settings";
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Type } from "lucide-react";
 
-export function HomepageForm({ initialSettings }: { initialSettings: any }) {
+export function HomepageForm({ initialSettings }: { initialSettings: SiteSettings | null }) {
   const [heroTitle, setHeroTitle] = useState(initialSettings?.hero_title ?? "");
   const [heroSubtitle, setHeroSubtitle] = useState(initialSettings?.hero_subtitle ?? "");
   const [heroDescription, setHeroDescription] = useState(initialSettings?.hero_description ?? "");

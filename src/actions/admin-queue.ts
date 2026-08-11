@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
@@ -40,7 +39,7 @@ export async function updateQueueStatus(queueId: string, status: string) {
   if (!isAuthorized) return { success: false, error: "Unauthorized" };
   const supabase = await createClient();
   
-  const updateData: any = { status };
+  const updateData: Record<string, string> = { status };
   const now = new Date().toISOString();
   
   if (status === "called") {

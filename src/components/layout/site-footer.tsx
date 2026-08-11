@@ -1,13 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import type { SiteSettings } from "@/types";
 
 import Link from "next/link";
 import { MapPin, Phone } from "lucide-react";
 import { useRealtimeSettings } from "@/hooks/use-settings";
 import { cn } from "@/lib/utils";
 
-export function SiteFooter({ settings: initialSettings }: { settings?: any }) {
-  const settings = useRealtimeSettings(initialSettings || {});
+export function SiteFooter({ settings: initialSettings }: { settings?: SiteSettings }) {
+  const settings = useRealtimeSettings(initialSettings || ({} as SiteSettings));
   return (
     <footer className="bg-surface-elevated pt-20 pb-10 border-t border-border">
       <div className="container mx-auto max-w-7xl px-6 md:px-12">

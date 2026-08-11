@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
+import type { GalleryItem } from "@/types";
 
 import { useState } from "react";
 import Image from "next/image";
@@ -15,7 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Loader2, Plus, Pencil, Trash2, Image as ImageIcon } from "lucide-react";
 
-export function GalleryClient({ initialGalleries }: { initialGalleries: any[] }) {
+export function GalleryClient({ initialGalleries }: { initialGalleries: GalleryItem[] }) {
   const [galleries, setGalleries] = useState(initialGalleries);
   const [isOpen, setIsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -46,15 +46,15 @@ export function GalleryClient({ initialGalleries }: { initialGalleries: any[] })
     setIsOpen(true);
   };
 
-  const handleOpenEdit = (gallery: any) => {
+  const handleOpenEdit = (gallery: GalleryItem) => {
     setEditingId(gallery.id);
     setImageUrl(gallery.image_url);
     setSelectedFile(null);
     setPreviewUrl(gallery.image_url);
     setAltText(gallery.alt_text || "");
     setCategory(gallery.category || "Umum");
-    setSortOrder(gallery.sort_order);
-    setIsPublished(gallery.is_published);
+    setSortOrder(gallery.sort_order || 0);
+    setIsPublished(gallery.is_published ?? true);
     setIsOpen(true);
   };
 
@@ -84,8 +84,8 @@ export function GalleryClient({ initialGalleries }: { initialGalleries: any[] })
         
         const { data: publicUrlData } = supabase.storage.from('gallery').getPublicUrl(fileName);
         finalImageUrl = publicUrlData.publicUrl;
-      } catch (err: any) {
-        alert("Gagal mengunggah gambar: " + err.message);
+      } catch (err: unknown) {
+        alert("Gagal mengunggah gambar: " + (err instanceof Error ? err.message : String(err)));
         setIsSaving(false);
         return;
       }
@@ -123,13 +123,13 @@ export function GalleryClient({ initialGalleries }: { initialGalleries: any[] })
     }
   };
 
-  const handleTogglePublished = async (gallery: any, checked: boolean) => {
+  const handleTogglePublished = async (gallery: GalleryItem, checked: boolean) => {
     setGalleries(galleries.map(g => g.id === gallery.id ? { ...g, is_published: checked } : g));
     await updateGallery(gallery.id, { 
       image_url: gallery.image_url, 
-      alt_text: gallery.alt_text,
-      category: gallery.category,
-      sort_order: gallery.sort_order, 
+      alt_text: gallery.alt_text || '',
+      category: gallery.category || 'Umum',
+      sort_order: gallery.sort_order || 0, 
       is_published: checked 
     });
   };

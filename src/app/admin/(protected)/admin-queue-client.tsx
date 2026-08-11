@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import type { Queue, Branch, Service, Barber } from "@/types";
 
 import { useState, useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr";
@@ -15,7 +15,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Loader2, Phone, Plus, Trash2, RefreshCw, AlertTriangle, MapPin } from "lucide-react";
 import { format } from "date-fns";
 
-export function AdminQueueClient({ initialQueues, options, userBranchId }: { initialQueues: any[], options?: any, userBranchId?: string | null }) {
+export function AdminQueueClient({ 
+  initialQueues, 
+  options, 
+  userBranchId 
+}: { 
+  initialQueues: Queue[], 
+  options?: { branches: Branch[], services: Service[], barbers: Barber[] }, 
+  userBranchId?: string | null 
+}) {
   const [prevInitial, setPrevInitial] = useState(initialQueues);
   const [queues, setQueues] = useState(initialQueues);
   
@@ -75,7 +83,7 @@ export function AdminQueueClient({ initialQueues, options, userBranchId }: { ini
                 // Fetch complete details might be missing here if just appending payload.new, 
                 // so we rely on server revalidate for full join data (like barber name, service name).
                 // However, we append it minimally to show it immediately.
-                return [...prev, payload.new];
+                return [...prev, payload.new as Queue];
              });
           }
         }
@@ -91,8 +99,8 @@ export function AdminQueueClient({ initialQueues, options, userBranchId }: { ini
     setLoadingId(queueId);
     try {
       await updateQueueStatus(queueId, newStatus);
-    } catch (error: any) {
-      alert("Gagal mengubah status: " + error.message);
+    } catch (error: unknown) {
+      alert("Gagal mengubah status: " + (error as Error).message);
     } finally {
       setLoadingId(null);
     }
@@ -106,8 +114,8 @@ export function AdminQueueClient({ initialQueues, options, userBranchId }: { ini
       if (!result?.success) {
         alert("Gagal menghapus antrean: " + result?.error);
       }
-    } catch (error: any) {
-      alert("Terjadi kesalahan sistem: " + error.message);
+    } catch (error: unknown) {
+      alert("Terjadi kesalahan sistem: " + (error as Error).message);
     } finally {
       setLoadingId(null);
     }
@@ -177,17 +185,17 @@ export function AdminQueueClient({ initialQueues, options, userBranchId }: { ini
   // Filter queues based on the active branch
   const filteredQueues = queues.filter(q => q.branch_id === activeBranchId);
 
-  const activeQueuesCount = filteredQueues.filter(q => ['waiting', 'called', 'in_service'].includes(q.status)).length;
-  const waitingQueuesCount = filteredQueues.filter(q => q.status === 'waiting').length;
-  const inServiceQueuesCount = filteredQueues.filter(q => ['called', 'in_service'].includes(q.status)).length;
-  const activeBranchName = branches.find((b: any) => b.id === activeBranchId)?.name || "Cabang";
+  const activeQueuesCount = filteredQueues.filter(q => ['waiting', 'called', 'in_service'].includes(q.status || '')).length;
+  const waitingQueuesCount = filteredQueues.filter(q => (q.status || '') === 'waiting').length;
+  const inServiceQueuesCount = filteredQueues.filter(q => ['called', 'in_service'].includes(q.status || '')).length;
+  const activeBranchName = branches.find((b: Branch) => b.id === activeBranchId)?.name || "Cabang";
 
   return (
     <div className="grid gap-4">
       {/* Tab Cabang */}
       {!userBranchId && branches.length > 1 && (
         <div className="flex flex-col sm:flex-row gap-2 p-1 bg-surface-elevated rounded-lg w-full max-w-md mb-2 border border-border">
-          {branches.map((branch: any) => (
+          {branches.map((branch: Branch) => (
             <button
               key={branch.id}
               onClick={() => setActiveBranchId(branch.id)}
@@ -286,7 +294,7 @@ export function AdminQueueClient({ initialQueues, options, userBranchId }: { ini
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <option value="">Pilih Layanan</option>
-                  {options?.services?.map((s: any) => (
+                  {options?.services?.map((s: Service) => (
                     <option key={s.id} value={s.id}>{s.name} - Rp{s.price}</option>
                   ))}
                 </select>
@@ -300,7 +308,7 @@ export function AdminQueueClient({ initialQueues, options, userBranchId }: { ini
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <option value="">Bebas Pilihkan</option>
-                  {options?.barbers?.map((b: any) => (
+                  {options?.barbers?.map((b: Barber) => (
                     <option key={b.id} value={b.id}>{b.name}</option>
                   ))}
                 </select>
@@ -338,7 +346,7 @@ export function AdminQueueClient({ initialQueues, options, userBranchId }: { ini
                     <span className="font-heading text-4xl font-bold text-foreground mb-3">
                       B{queue.queue_number?.toString().padStart(2, '0') || '00'}
                     </span>
-                    {getStatusBadge(queue.status)}
+                    {getStatusBadge(queue.status || '')}
                   </div>
                   
                   {/* Middle Column - Details */}

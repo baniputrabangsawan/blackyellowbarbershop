@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import type { Service } from "@/types";
 
 import { useState } from "react";
 import { updateServiceStatus, updateServiceDetails, deleteService } from "@/actions/admin-services";
@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Edit2, Save, X, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
-export function AdminServicesClient({ initialServices }: { initialServices: any[] }) {
+export function AdminServicesClient({ initialServices }: { initialServices: Service[] }) {
   const [services, setServices] = useState(initialServices);
   const [loadingId, setLoadingId] = useState<string | null>(null);
   
@@ -29,7 +29,7 @@ export function AdminServicesClient({ initialServices }: { initialServices: any[
     setLoadingId(null);
   };
 
-  const handleEditClick = (service: any) => {
+  const handleEditClick = (service: Service) => {
     setEditingServiceId(service.id);
     setEditForm({
       name: service.name,
@@ -184,7 +184,7 @@ export function AdminServicesClient({ initialServices }: { initialServices: any[
                             size="sm"
                             variant="outline"
                             disabled={loadingId === service.id}
-                            onClick={() => handleToggleStatus(service.id, service.is_active)}
+                            onClick={() => handleToggleStatus(service.id, service.is_active ?? true)}
                             className={service.is_active ? "text-destructive hover:bg-destructive/10 hover:text-destructive border-border" : "text-success hover:bg-success/10 hover:text-success border-border"}
                           >
                             {loadingId === service.id ? (

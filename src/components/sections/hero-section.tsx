@@ -7,10 +7,10 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRealtimeSettings } from "@/hooks/use-settings";
+import type { SiteSettings } from "@/types";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function HeroSection({ settings: initialSettings }: { settings?: any }) {
-  const settings = useRealtimeSettings(initialSettings || {});
+export function HeroSection({ settings: initialSettings }: { settings?: SiteSettings }) {
+  const settings = useRealtimeSettings(initialSettings || ({} as SiteSettings));
   const title = settings?.hero_title || "Potongan Presisi.";
   const subtitle = settings?.hero_subtitle || "Gaya Tanpa Kompromi.";
   const description = settings?.hero_description || "Lebih dari sekadar pangkas rambut. Kami menghadirkan pengalaman premium dengan barber profesional untuk tampilan terbaik Anda.";

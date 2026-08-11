@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import type { SiteSettings } from "@/types";
 
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,9 +13,10 @@ import { Save, Loader2, KeyRound } from "lucide-react";
 import { updateSiteSettingsAction } from "./actions";
 import { updateAdminCredentials } from "@/actions/auth-settings";
 
-type SettingsData = Record<string, any>;
+type SettingsData = Partial<SiteSettings>;
+type AdminAccount = { user_id: string; username: string; branch_name: string; };
 
-export function SettingsForm({ initialData, userRole, adminAccounts = [] }: { initialData: SettingsData, userRole?: string | null, adminAccounts?: any[] }) {
+export function SettingsForm({ initialData, userRole, adminAccounts = [] }: { initialData: SettingsData, userRole?: string | null, adminAccounts?: AdminAccount[] }) {
   const [formData, setFormData] = useState<SettingsData>(initialData || {});
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
@@ -26,13 +27,6 @@ export function SettingsForm({ initialData, userRole, adminAccounts = [] }: { in
   const [newPassword, setNewPassword] = useState("");
   const [isResetting, setIsResetting] = useState(false);
 
-  // Effect to update input when selection changes
-  useEffect(() => {
-    const selectedAdmin = adminAccounts.find(a => a.user_id === targetAdmin);
-    if (selectedAdmin) {
-      setNewUsername(selectedAdmin.username);
-    }
-  }, [targetAdmin, adminAccounts]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,7 +54,7 @@ export function SettingsForm({ initialData, userRole, adminAccounts = [] }: { in
     setIsResetting(false);
   };
 
-  const handleChange = (field: string, value: any) => {
+  const handleChange = (field: keyof SiteSettings, value: string | number | boolean | null) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -374,7 +368,14 @@ export function SettingsForm({ initialData, userRole, adminAccounts = [] }: { in
                     <select 
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-warning"
                       value={targetAdmin}
-                      onChange={(e) => setTargetAdmin(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setTargetAdmin(val);
+                        const selectedAdmin = adminAccounts.find(a => a.user_id === val);
+                        if (selectedAdmin) {
+                          setNewUsername(selectedAdmin.username);
+                        }
+                      }}
                     >
                       {adminAccounts.map((admin) => (
                         <option key={admin.user_id} value={admin.user_id}>

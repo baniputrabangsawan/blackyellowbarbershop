@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import type { SiteSettings } from "@/types";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
@@ -20,10 +20,10 @@ interface BranchStatus {
   storeState: string;
 }
 
-export function QueuePreviewSection({ settings: initialSettings }: { settings?: any }) {
+export function QueuePreviewSection({ settings: initialSettings }: { settings?: SiteSettings }) {
   const [isLoading, setIsLoading] = useState(true);
   const [branchStatuses, setBranchStatuses] = useState<BranchStatus[]>([]);
-  const settings = useRealtimeSettings(initialSettings || {});
+  const settings = useRealtimeSettings(initialSettings || ({} as SiteSettings));
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost',
@@ -31,7 +31,6 @@ export function QueuePreviewSection({ settings: initialSettings }: { settings?: 
   );
 
   useEffect(() => {
-    let globalSubscription: any = null;
     let pollInterval: NodeJS.Timeout | null = null;
     let isPolling = false;
     let isDisposed = false;
@@ -54,33 +53,7 @@ export function QueuePreviewSection({ settings: initialSettings }: { settings?: 
         setBranchStatuses(statuses);
         setIsLoading(false);
 
-        // Subscribe to real-time updates for queues
-        const channelId = typeof window !== 'undefined' ? Math.random().toString(36).substring(2) : Date.now();
-        globalSubscription = supabase
-          .channel(`global-queues-preview-${channelId}`)
-          .on(
-            'postgres_changes',
-            { event: '*', schema: 'public', table: 'queues' },
-            async () => {
-              if (isDisposed) return;
-              const newStatuses = await Promise.all(branches.map(b => fetchQueueStatus(b.id, b.name)));
-              if (isDisposed) return;
-              setBranchStatuses(newStatuses);
-            }
-          )
-          .on(
-            'postgres_changes',
-            { event: '*', schema: 'public', table: 'site_settings' },
-            async () => {
-              if (isDisposed) return;
-              const newStatuses = await Promise.all(branches.map(b => fetchQueueStatus(b.id, b.name)));
-              if (isDisposed) return;
-              setBranchStatuses(newStatuses);
-            }
-          )
-          .subscribe();
-
-        // Realtime is the primary update mechanism. Poll less frequently as a fallback.
+        // Gunakan Smart Polling 10 detik sebagai ganti Realtime karena alasan Security (RLS Queues ditutup)
         pollInterval = setInterval(async () => {
           if (isDisposed || isPolling) return;
           isPolling = true;
@@ -94,7 +67,7 @@ export function QueuePreviewSection({ settings: initialSettings }: { settings?: 
           } finally {
             isPolling = false;
           }
-        }, 30000);
+        }, 10000); // 10 seconds polling
       }
     };
 
@@ -102,9 +75,6 @@ export function QueuePreviewSection({ settings: initialSettings }: { settings?: 
 
     return () => {
       isDisposed = true;
-      if (globalSubscription) {
-        supabase.removeChannel(globalSubscription);
-      }
       if (pollInterval) {
         clearInterval(pollInterval);
       }

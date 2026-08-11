@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
+import type { SiteSettings } from "@/types";
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
-export async function updateSiteSettingsAction(data: any) {
+export async function updateSiteSettingsAction(data: Partial<SiteSettings>) {
   const supabase = await createClient();
 
   // Ambil ID setting pertama

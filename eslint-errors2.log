@@ -1,0 +1,46 @@
+
+/home/baniputrabangsawan/project-web/yellow-barbershop-makassar/src/actions/admin-testimonial.ts
+  6:15  warning  'Testimonial' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/baniputrabangsawan/project-web/yellow-barbershop-makassar/src/actions/settings.ts
+  18:8  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/baniputrabangsawan/project-web/yellow-barbershop-makassar/src/app/admin/(protected)/content/testimonial/testimonial-client.tsx
+  219:21  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  219:43  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/home/baniputrabangsawan/project-web/yellow-barbershop-makassar/src/app/admin/(protected)/content/testimonials/testimonials-client.tsx
+   15:89  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   21:50  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   87:27  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  161:19  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  161:34  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/home/baniputrabangsawan/project-web/yellow-barbershop-makassar/src/app/admin/(protected)/layout.tsx
+  4:53  warning  'ShieldCheck' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/baniputrabangsawan/project-web/yellow-barbershop-makassar/src/app/admin/(protected)/settings/settings-form.tsx
+  4:20  warning  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/baniputrabangsawan/project-web/yellow-barbershop-makassar/src/app/queue/queue-form.tsx
+  92:29  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+/home/baniputrabangsawan/project-web/yellow-barbershop-makassar/src/app/queue/queue-form.tsx:92:29
+  90 |   });
+  91 |
+> 92 |   const selectedServiceId = watch("serviceId");
+     |                             ^^^^^ React Hook Form's `useForm()` API returns a `watch()` function which cannot be memoized safely.
+  93 |   const selectedBranchId = watch("branchId");
+  94 |   const selectedService = options.services.find(
+  95 |     (s: Service) => s.id === selectedServiceId  react-hooks/incompatible-library
+
+/home/baniputrabangsawan/project-web/yellow-barbershop-makassar/src/lib/supabase/admin.ts
+  2:15  warning  'Database' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/baniputrabangsawan/project-web/yellow-barbershop-makassar/src/lib/supabase/public.ts
+  2:15  warning  'Database' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 14 problems (8 errors, 6 warnings)
+

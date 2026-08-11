@@ -1,4 +1,5 @@
 "use client";
+import type { Barber } from "@/types";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,8 +8,7 @@ import { Scissors, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function BarberSection({ barbers = [] }: { barbers?: any[] }) {
+export function BarberSection({ barbers = [] }: { barbers?: Barber[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(1); // Default for mobile (SSR safe)
 
@@ -90,6 +90,7 @@ export function BarberSection({ barbers = [] }: { barbers?: any[] }) {
                         src={imageUrl}
                         alt={barber.name}
                         fill
+                        priority={index === 0}
                         sizes="(max-width: 768px) 100vw, 33vw"
                         className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
                       />

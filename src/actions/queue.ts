@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
@@ -82,9 +83,9 @@ export async function getQueueOptions() {
   const supabase = await createClient();
   
   const [branches, services, barbers] = await Promise.all([
-    supabase.from("branches").select("id, name").eq("is_active", true),
-    supabase.from("services").select("id, name, price, duration_minutes").eq("is_active", true).order("sort_order"),
-    supabase.from("barbers").select("id, name").eq("is_active", true)
+    supabase.from("branches").select("*").eq("is_active", true),
+    supabase.from("services").select("*").eq("is_active", true).order("sort_order"),
+    supabase.from("barbers").select("*").eq("is_active", true)
   ]);
   
   return {
@@ -95,13 +96,13 @@ export async function getQueueOptions() {
 }
 
 export async function getLiveQueueStatus(branchId: string) {
-  const supabase = await createClient();
+  const supabaseAdmin = createAdminClient();
   const today = new Date().toLocaleString("en-US", { timeZone: "Asia/Makassar" });
   const todayDateStr = new Date(today).toISOString().split("T")[0];
   
   const [{ data: currentQueue }, { count: waitingCount }] = await Promise.all([
     // Dapatkan antrean yang sedang dipanggil / dilayani (maksimal 1 terbaru)
-    supabase
+    supabaseAdmin
       .from("queues")
       .select("queue_number")
       .eq("branch_id", branchId)
@@ -111,7 +112,7 @@ export async function getLiveQueueStatus(branchId: string) {
       .limit(1)
       .maybeSingle(),
     // Dapatkan jumlah yang sedang menunggu
-    supabase
+    supabaseAdmin
       .from("queues")
       .select("id", { count: "exact", head: true })
       .eq("branch_id", branchId)
@@ -133,7 +134,7 @@ export async function getLiveQueueStatus(branchId: string) {
 
 export async function getStoreQueueState(branchId: string): Promise<'open' | 'closed' | 'offline' | 'full'> {
   try {
-    const supabase = await createClient();
+    const supabaseAdmin = createAdminClient();
     
     // Get current time in Makassar timezone
     // const now = new Date();
@@ -150,25 +151,25 @@ export async function getStoreQueueState(branchId: string): Promise<'open' | 'cl
       { count: waitingCount }
     ] = await Promise.all([
       // Check if the branch is manually closed by the admin (is_active = false)
-      supabase
+      supabaseAdmin
         .from("branches")
         .select("is_active")
         .eq("id", branchId)
         .single(),
       // Check Global Site Settings from Admin Dashboard
-      supabase
+      supabaseAdmin
         .from("site_settings")
         .select("*")
         .limit(1)
         .maybeSingle(),
       // Hitung total antrean hari ini
-      supabase
+      supabaseAdmin
         .from("queues")
         .select("id", { count: "exact", head: true })
         .eq("branch_id", branchId)
         .eq("queue_date", todayDateStr),
       // Hitung total antrean yang sedang menunggu
-      supabase
+      supabaseAdmin
         .from("queues")
         .select("id", { count: "exact", head: true })
         .eq("branch_id", branchId)

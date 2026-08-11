@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 "use client";
+import type { SiteSettings } from "@/types";
 
 import * as React from "react";
 import Link from "next/link";
@@ -19,8 +19,8 @@ const navLinks = [
   { name: "Lokasi", href: "/#location" },
 ];
 
-export function SiteHeader({ settings: initialSettings }: { settings?: any }) {
-  const settings = useRealtimeSettings(initialSettings || {});
+export function SiteHeader({ settings: initialSettings }: { settings?: SiteSettings }) {
+  const settings = useRealtimeSettings(initialSettings || ({} as SiteSettings));
   const [isOpen, setIsOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
   const scrolledRef = React.useRef(false);

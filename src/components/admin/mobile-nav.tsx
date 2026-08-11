@@ -30,6 +30,7 @@ const adminGroups = [
     links: [
       { name: "Halaman Utama", href: "/admin/content/homepage", icon: Home },
       { name: "Galeri", href: "/admin/content/gallery", icon: ImageIcon },
+      { name: "Testimonial", href: "/admin/content/testimonial", icon: MessageSquare },
       { name: "FAQ", href: "/admin/content/faq", icon: MessageSquare },
       { name: "Promo", href: "/admin/content/promo", icon: Tag },
     ]

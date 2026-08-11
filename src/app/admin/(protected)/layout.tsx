@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import { 
-  Users, CalendarClock, Scissors, Settings, LogOut, ShieldCheck,
+  Users, CalendarClock, Scissors, Settings, LogOut,
   Home, Image as ImageIcon, MessageSquare, Tag, Activity, Globe
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -20,26 +20,20 @@ export const metadata = {
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
 
-  // Langkah 1: Baca session dari cookie secara lokal (cepat, tanpa network request)
-  // Ini hanya untuk mendapat user.id agar bisa query admin_users secara paralel
-  const { data: { session } } = await supabase.auth.getSession();
+  // Langkah 1: Validasi token langsung ke Supabase Auth Server (getUser)
+  // Ini mencegah munculnya error/warning "getSession is insecure" di console log
+  const { data: { user }, error } = await supabase.auth.getUser();
 
-  if (!session) {
-    redirect("/admin/login");
-  }
-
-  // Langkah 2: Jalankan validasi server (getUser) dan pengecekan DB secara PARALEL
-  // getUser() memvalidasi token ke Supabase Auth Server
-  // admin_users query menggunakan session.user.id yang sudah kita dapat di langkah 1
-  const [{ data: { user }, error }, { data: adminUser, error: adminError }] = await Promise.all([
-    supabase.auth.getUser(),
-    supabase.from("admin_users").select("role").eq("user_id", session.user.id).single(),
-  ]);
-
-  // Validasi hasil — logika keamanan tetap sama persis
   if (error || !user) {
     redirect("/admin/login");
   }
+
+  // Langkah 2: Verifikasi role admin di tabel admin_users
+  const { data: adminUser, error: adminError } = await supabase
+    .from("admin_users")
+    .select("role")
+    .eq("user_id", user.id)
+    .single();
 
   if (adminError || !adminUser) {
     // Memaksa logout jika bukan admin
@@ -89,6 +83,10 @@ export default async function AdminLayout({ children }: { children: ReactNode })
               <Link href="/admin/content/gallery" className="flex items-center gap-3 px-4 py-2.5 rounded-md text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors">
                 <ImageIcon size={20} />
                 Galeri
+              </Link>
+              <Link href="/admin/content/testimonial" className="flex items-center gap-3 px-4 py-2.5 rounded-md text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors">
+                <MessageSquare size={20} />
+                Testimonial
               </Link>
               <Link href="/admin/content/faq" className="flex items-center gap-3 px-4 py-2.5 rounded-md text-muted-foreground hover:bg-white/5 hover:text-foreground transition-colors">
                 <MessageSquare size={20} />

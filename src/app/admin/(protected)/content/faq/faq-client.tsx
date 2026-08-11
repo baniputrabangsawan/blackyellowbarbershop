@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import type { Faq } from "@/types";
 
 import { useState } from "react";
 import { createFaq, updateFaq, deleteFaq } from "@/actions/admin-faq";
@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Loader2, Plus, Pencil, Trash2, GripVertical } from "lucide-react";
 
-export function FaqClient({ initialFaqs }: { initialFaqs: any[] }) {
+export function FaqClient({ initialFaqs }: { initialFaqs: Faq[] }) {
   const [faqs, setFaqs] = useState(initialFaqs);
   const [isOpen, setIsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -36,12 +36,12 @@ export function FaqClient({ initialFaqs }: { initialFaqs: any[] }) {
     setIsOpen(true);
   };
 
-  const handleOpenEdit = (faq: any) => {
+  const handleOpenEdit = (faq: Faq) => {
     setEditingId(faq.id);
     setQuestion(faq.question);
     setAnswer(faq.answer);
-    setSortOrder(faq.sort_order);
-    setIsActive(faq.is_active);
+    setSortOrder(faq.sort_order || 0);
+    setIsActive(faq.is_active ?? true);
     setIsOpen(true);
   };
 
@@ -82,12 +82,12 @@ export function FaqClient({ initialFaqs }: { initialFaqs: any[] }) {
     }
   };
 
-  const handleToggleActive = async (faq: any, checked: boolean) => {
+  const handleToggleActive = async (faq: Faq, checked: boolean) => {
     setFaqs(faqs.map(f => f.id === faq.id ? { ...f, is_active: checked } : f));
     await updateFaq(faq.id, { 
       question: faq.question, 
       answer: faq.answer, 
-      sort_order: faq.sort_order, 
+      sort_order: faq.sort_order || 0, 
       is_active: checked 
     });
   };

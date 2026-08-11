@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import type { Faq } from "@/types";
 
 import {
   Accordion,
@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/accordion";
 import { motion } from "motion/react";
 
-export function FaqSection({ faqs = [] }: { faqs?: any[] }) {
+export function FaqSection({ faqs = [] }: { faqs?: Faq[] }) {
   if (!faqs || faqs.length === 0) return null;
   return (
     <section id="faq" className="py-24 bg-surface border-y border-border">

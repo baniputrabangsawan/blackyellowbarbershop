@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import type { Queue } from "@/types";
 
 import { useEffect, useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
@@ -16,7 +16,7 @@ export function QueueTicketClient({
   initialWaiting,
   initialEstimatedMins 
 }: { 
-  initialQueue: any, 
+  initialQueue: Queue, 
   initialWaiting: number,
   initialEstimatedMins: number
 }) {
@@ -45,7 +45,7 @@ export function QueueTicketClient({
         (payload) => {
           setIsUpdating(true);
           setTimeout(() => {
-            setQueue((prev: any) => ({ ...prev, ...payload.new }));
+            setQueue((prev: Queue) => ({ ...prev, ...payload.new }));
             setIsUpdating(false);
           }, 500);
         }
@@ -90,9 +90,9 @@ export function QueueTicketClient({
     }
   };
 
-  const statusDisplay = getStatusDisplay(queue.status);
-  const queueNumberStr = `B${queue.queue_number.toString().padStart(2, '0')}`;
-  const isDone = ['completed', 'cancelled', 'no_show'].includes(queue.status);
+  const statusDisplay = getStatusDisplay(queue.status || 'waiting');
+  const queueNumberStr = `B${(queue.queue_number || 0).toString().padStart(2, '0')}`;
+  const isDone = ['completed', 'cancelled', 'no_show'].includes(queue.status || 'waiting');
 
   return (
     <Card className="bg-surface border-primary/30 relative overflow-hidden shadow-2xl">
@@ -100,7 +100,7 @@ export function QueueTicketClient({
       <CardContent className="p-8 md:p-12">
         <div className="flex justify-between items-center mb-8">
           <div className="text-sm text-muted-foreground">
-            {format(new Date(queue.queue_date), 'EEEE, d MMMM yyyy', { locale: id })}
+            {format(new Date(queue.queue_date || new Date().toISOString()), 'EEEE, d MMMM yyyy', { locale: id })}
           </div>
           <div className={`px-3 py-1 rounded-full border text-xs font-semibold uppercase tracking-wider ${statusDisplay.color} ${statusDisplay.animate ? 'animate-pulse' : ''}`}>
             {statusDisplay.label}

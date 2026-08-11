@@ -1,12 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import type { SiteSettings } from "@/types";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, Clock, Navigation } from "lucide-react";
 import { motion } from "motion/react";
 
-export function LocationSection({ settings }: { settings?: any }) {
+export function LocationSection({ settings }: { settings?: SiteSettings }) {
   return (
     <section id="location" className="py-24 bg-background">
       <div className="container mx-auto max-w-7xl px-6 md:px-12">
@@ -91,7 +91,7 @@ export function LocationSection({ settings }: { settings?: any }) {
                       {settings?.whatsapp && (
                         <Button 
                           className="bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-full"
-                          onClick={() => window.open(`https://wa.me/${settings.whatsapp.replace(/\D/g, '')}`, '_blank')}
+                          onClick={() => window.open(`https://wa.me/${(settings.whatsapp || '').replace(/\D/g, '')}`, '_blank')}
                         >
                           Chat WhatsApp
                         </Button>

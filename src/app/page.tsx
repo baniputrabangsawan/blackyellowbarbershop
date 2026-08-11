@@ -7,7 +7,8 @@ import { BarberSection } from "@/components/sections/barber-section";
 import { GallerySection } from "@/components/sections/gallery-section";
 import { LocationSection } from "@/components/sections/location-section";
 import { FaqSection } from "@/components/sections/faq-section";
-import { getPublicSettings, getPublicGalleries, getPublicFaqs, getPublicPromos, getPublicBarbers } from "@/actions/settings";
+import { TestimonialsSection } from "@/components/sections/testimonials-section";
+import { getPublicSettings, getPublicGalleries, getPublicFaqs, getPublicPromos, getPublicBarbers, getPublicTestimonials } from "@/actions/settings";
 import { PromoBanner } from "@/components/sections/promo-banner";
 import { RealtimeRefresh } from "@/components/realtime-refresh";
 
@@ -16,12 +17,13 @@ export const dynamic = 'force-dynamic';
 export default async function Home() {
   // Jalankan semua query database secara paralel, bukan berurutan
   // Ini memotong waktu tunggu server dari ~800ms menjadi ~200ms
-  const [settings, galleries, faqs, promos, barbers] = await Promise.all([
+  const [settings, galleries, faqs, promos, barbers, testimonials] = await Promise.all([
     getPublicSettings(),
     getPublicGalleries(),
     getPublicFaqs(),
     getPublicPromos(),
     getPublicBarbers(),
+    getPublicTestimonials(),
   ]);
 
   return (
@@ -35,6 +37,7 @@ export default async function Home() {
         <QueuePreviewSection settings={settings} />
         <BarberSection barbers={barbers} />
         <GallerySection galleries={galleries} />
+        <TestimonialsSection testimonials={testimonials} />
         <LocationSection settings={settings} />
         <FaqSection faqs={faqs} />
       </main>
