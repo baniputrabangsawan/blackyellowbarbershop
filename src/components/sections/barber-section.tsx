@@ -90,7 +90,6 @@ export function BarberSection({ barbers = [] }: { barbers?: Barber[] }) {
                         src={imageUrl}
                         alt={barber.name}
                         fill
-                        priority={index === 0}
                         sizes="(max-width: 768px) 100vw, 33vw"
                         className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
                       />
