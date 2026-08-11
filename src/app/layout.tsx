@@ -59,6 +59,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+import NextTopLoader from 'nextjs-toploader';
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -132,6 +134,7 @@ export default async function RootLayout({
       className={`${inter.variable} ${spaceGrotesk.variable} dark antialiased`}
     >
       <body className="min-h-dvh flex flex-col font-sans bg-background text-foreground">
+        <NextTopLoader color="#EAB308" height={3} showSpinner={false} shadow="0 0 10px #EAB308,0 0 5px #EAB308" />
         <SmoothScrollProvider />
         <script
           type="application/ld+json"
