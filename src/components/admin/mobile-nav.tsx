@@ -54,6 +54,17 @@ export function AdminMobileNav() {
   const [isOpen, setIsOpen] = React.useState(false);
   const pathname = usePathname();
 
+  React.useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   return (
     <div className="md:hidden sticky top-0 z-50 w-full">
       <AnimatePresence>
@@ -93,7 +104,7 @@ export function AdminMobileNav() {
             className="absolute left-0 w-full bg-background border-b border-border shadow-xl overflow-hidden z-10"
             style={{ top: '100%' }}
           >
-            <nav className="flex flex-col p-4 space-y-4 overflow-y-auto max-h-[calc(100vh-73px)]">
+            <nav className="flex flex-col p-4 space-y-4 overflow-y-auto overscroll-contain max-h-[calc(100dvh-73px)] pb-12">
               {adminGroups.map((group, groupIdx) => (
                 <div key={groupIdx} className="space-y-1">
                   {group.title !== "Dashboard" && (
