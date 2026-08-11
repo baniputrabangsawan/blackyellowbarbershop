@@ -13,6 +13,13 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  webpack: (config) => {
+    config.watchOptions = {
+      ...config.watchOptions,
+      ignored: ['**/node_modules/**', '**/supabase/**'],
+    };
+    return config;
+  },
 };
 
 export default nextConfig;
