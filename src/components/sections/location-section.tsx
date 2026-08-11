@@ -119,6 +119,7 @@ export function LocationSection({ settings }: { settings?: SiteSettings }) {
             
             {settings?.maps_url ? (
               <iframe 
+                title="Peta Lokasi Cabang Black Yellow Barbershop"
                 src={settings.maps_url} 
                 className="absolute inset-0 w-full h-full opacity-50 grayscale hover:grayscale-0 transition-all duration-500 z-10" 
                 style={{border:0}} 
@@ -128,6 +129,7 @@ export function LocationSection({ settings }: { settings?: SiteSettings }) {
               ></iframe>
             ) : (
               <iframe 
+                title="Peta Lokasi Cabang Black Yellow Barbershop"
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4708.67626804175!2d119.50837597937148!3d-5.117271599999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dbefbd4556fd6d3%3A0x7c0eec4315e7126e!2sBlack%20Yellow%20Barbershop%20Makassar!5e1!3m2!1sen!2sid!4v1786023141917!5m2!1sen!2sid" 
                 className="absolute inset-0 w-full h-full opacity-50 grayscale hover:grayscale-0 transition-all duration-500 z-10" 
                 style={{border:0}} 
