@@ -9,6 +9,7 @@ import { LocationSection } from "@/components/sections/location-section";
 import { FaqSection } from "@/components/sections/faq-section";
 import { TestimonialsSection } from "@/components/sections/testimonials-section";
 import { getPublicSettings, getPublicGalleries, getPublicFaqs, getPublicPromos, getPublicBarbers, getPublicTestimonials } from "@/actions/settings";
+import { getPublicQueueStatuses } from "@/actions/queue";
 import { PromoBanner } from "@/components/sections/promo-banner";
 import { RealtimeRefresh } from "@/components/realtime-refresh";
 
@@ -17,13 +18,14 @@ export const dynamic = 'force-dynamic';
 export default async function Home() {
   // Jalankan semua query database secara paralel, bukan berurutan
   // Ini memotong waktu tunggu server dari ~800ms menjadi ~200ms
-  const [settings, galleries, faqs, promos, barbers, testimonials] = await Promise.all([
+  const [settings, galleries, faqs, promos, barbers, testimonials, queueStatuses] = await Promise.all([
     getPublicSettings(),
     getPublicGalleries(),
     getPublicFaqs(),
     getPublicPromos(),
     getPublicBarbers(),
     getPublicTestimonials(),
+    getPublicQueueStatuses(),
   ]);
 
   return (
@@ -34,7 +36,7 @@ export default async function Home() {
       <main className="flex w-full flex-1 flex-col">
         <HeroSection settings={settings} />
         <ServicesSection />
-        <QueuePreviewSection settings={settings} />
+        <QueuePreviewSection settings={settings} initialStatuses={queueStatuses} />
         <BarberSection barbers={barbers} />
         <GallerySection galleries={galleries} />
         <TestimonialsSection testimonials={testimonials} />

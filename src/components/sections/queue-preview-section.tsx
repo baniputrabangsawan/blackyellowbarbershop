@@ -20,9 +20,9 @@ interface BranchStatus {
   storeState: string;
 }
 
-export function QueuePreviewSection({ settings: initialSettings }: { settings?: SiteSettings }) {
-  const [isLoading, setIsLoading] = useState(true);
-  const [branchStatuses, setBranchStatuses] = useState<BranchStatus[]>([]);
+export function QueuePreviewSection({ settings: initialSettings, initialStatuses = [] }: { settings?: SiteSettings, initialStatuses?: BranchStatus[] }) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [branchStatuses, setBranchStatuses] = useState<BranchStatus[]>(initialStatuses);
   const settings = useRealtimeSettings(initialSettings || ({} as SiteSettings));
 
   const supabase = createBrowserClient(
@@ -43,17 +43,11 @@ export function QueuePreviewSection({ settings: initialSettings }: { settings?: 
       return { id: branchId, name: branchName, ...liveStatus, storeState } as BranchStatus;
     };
 
-    const fetchInitialData = async () => {
-      // Fetch ALL active branches
-      const { data: branches } = await supabase.from("branches").select("id, name").eq("is_active", true).order("name");
-      if (branches && !isDisposed) {
-        const statuses = await Promise.all(branches.map(b => fetchQueueStatus(b.id, b.name)));
-        if (isDisposed) return;
-
-        setBranchStatuses(statuses);
-        setIsLoading(false);
-
-        // Gunakan Smart Polling 10 detik sebagai ganti Realtime karena alasan Security (RLS Queues ditutup)
+    const startPolling = async () => {
+      // Fetch ALL active branches (only needed for polling structure, but we already have initialStatuses)
+      const branches = initialStatuses.map(s => ({ id: s.id, name: s.name }));
+      if (branches.length > 0 && !isDisposed) {
+        // We already have initial data, start polling right away
         pollInterval = setInterval(async () => {
           if (isDisposed || isPolling) return;
           isPolling = true;
@@ -71,7 +65,7 @@ export function QueuePreviewSection({ settings: initialSettings }: { settings?: 
       }
     };
 
-    fetchInitialData();
+    startPolling();
 
     return () => {
       isDisposed = true;

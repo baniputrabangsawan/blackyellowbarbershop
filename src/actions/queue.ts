@@ -95,6 +95,23 @@ export async function getQueueOptions() {
   };
 }
 
+export async function getPublicQueueStatuses() {
+  const supabase = await createClient();
+  const { data: branches } = await supabase.from("branches").select("id, name").eq("is_active", true).order("name");
+  
+  if (!branches) return [];
+
+  const statuses = await Promise.all(branches.map(async (b) => {
+    const [liveStatus, storeState] = await Promise.all([
+      getLiveQueueStatus(b.id),
+      getStoreQueueState(b.id),
+    ]);
+    return { id: b.id, name: b.name, ...liveStatus, storeState };
+  }));
+  
+  return statuses;
+}
+
 export async function getLiveQueueStatus(branchId: string) {
   const supabaseAdmin = createAdminClient();
   const today = new Date().toLocaleString("en-US", { timeZone: "Asia/Makassar" });
