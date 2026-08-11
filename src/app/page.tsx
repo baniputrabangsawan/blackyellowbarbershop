@@ -16,9 +16,12 @@ import { RealtimeRefresh } from "@/components/realtime-refresh";
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  // Jalankan semua query database secara paralel, bukan berurutan
-  // Ini memotong waktu tunggu server dari ~800ms menjadi ~200ms
-  const [settings, galleries, faqs, promos, barbers, testimonials, queueStatuses] = await Promise.all([
+  // Supabase returns objects with a null prototype (Object.create(null)). 
+  // Passing them directly to Client Components throws React Error 441.
+  // We sanitize them by serializing and deserializing.
+  const [
+    rawSettings, rawGalleries, rawFaqs, rawPromos, rawBarbers, rawTestimonials, rawQueueStatuses
+  ] = await Promise.all([
     getPublicSettings(),
     getPublicGalleries(),
     getPublicFaqs(),
@@ -27,6 +30,15 @@ export default async function Home() {
     getPublicTestimonials(),
     getPublicQueueStatuses(),
   ]);
+
+  const sanitize = <T,>(data: T): T => data === undefined ? data : JSON.parse(JSON.stringify(data));
+  const settings = sanitize(rawSettings);
+  const galleries = sanitize(rawGalleries);
+  const faqs = sanitize(rawFaqs);
+  const promos = sanitize(rawPromos);
+  const barbers = sanitize(rawBarbers);
+  const testimonials = sanitize(rawTestimonials);
+  const queueStatuses = sanitize(rawQueueStatuses);
 
   return (
     <>
