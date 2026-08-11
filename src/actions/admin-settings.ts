@@ -148,7 +148,7 @@ export async function resetTodayQueue(branchId: string, reason: string = "Reset 
   const { isAuthorized } = await verifyAdmin();
   if (!isAuthorized) return { success: false, error: "Unauthorized" };
   const supabase = await createClient();
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Intl.DateTimeFormat("fr-CA", { timeZone: "Asia/Makassar" }).format(new Date());
   
   // "Reset" means cancelling all current queues for today that are not completed
   const { error } = await supabase
